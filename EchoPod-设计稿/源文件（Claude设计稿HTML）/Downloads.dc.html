@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>离线下载</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg{display:block}
+</style>
+</helmet>
+<div style="width:390px;height:844px;position:relative;overflow:hidden;background:#F7F5F0;color:#1C1B19;font-family:Inter,'Noto Sans SC',system-ui,sans-serif">
+  <div style="padding:16px 16px 0;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;margin:0 -12px">
+      <a href="Profile.dc.html" aria-label="返回" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+      <h1 style="margin:0;font-size:20px;font-weight:700;flex:1">离线下载</h1>
+      <a href="Settings.dc.html" aria-label="下载设置" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg></a>
+    </div>
+
+    <div style="background:#FFFFFF;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:600">1.2 GB <span style="font-weight:400;color:#6B675F;font-size:13px">/ 应用专属存储</span></span><span style="font-size:12px;color:#6B675F">设备可用 18.4 GB</span></div>
+      <div style="height:8px;border-radius:4px;background:#EFECE5;overflow:hidden;display:flex"><span style="width:22%;background:#2E6B66"></span><span style="width:4%;background:#86C6BD"></span></div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span style="height:26px;padding:0 10px;border-radius:13px;background:#EFECE5;font-size:12px;display:flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"></path><circle cx="12" cy="19.5" r="1" fill="currentColor"></circle></svg>仅 Wi-Fi</span>
+        <span style="height:26px;padding:0 10px;border-radius:13px;background:#EFECE5;font-size:12px;display:flex;align-items:center">同时 2 个</span>
+        <span style="height:26px;padding:0 10px;border-radius:13px;background:#EFECE5;font-size:12px;display:flex;align-items:center">已播放自动清理：关</span>
+      </div>
+    </div>
+
+    <h2 style="margin:6px 0 0;font-size:16px;font-weight:600">进行中 · 3</h2>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;gap:12px;align-items:center;padding:6px 0">
+        <div style="width:48px;height:48px;border-radius:8px;background:#2E6B66;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:24px;height:24px;border-radius:50%;background:#E8D9B8"></span><span style="position:absolute;left:5px;bottom:3px;font-size:22px;font-weight:700;line-height:1;color:#F7F5F0">码</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Compose 重组优化：我们踩过的五个坑</div>
+          <div style="height:3px;border-radius:2px;background:#E3DFD6;margin-top:7px;overflow:hidden"><div style="width:64%;height:100%;background:#2E6B66"></div></div>
+          <div style="font-size:12px;color:#6B675F;margin-top:5px;font-variant-numeric:tabular-nums">22.5 / 35.2 MB · 1.8 MB/s</div>
+        </div>
+        <button aria-label="暂停下载" style="width:48px;height:48px;border-radius:24px;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect><rect x="13.9" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect></svg></button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:6px 0">
+        <div style="width:48px;height:48px;border-radius:8px;background:#8C4A3C;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:24px;height:24px;border-radius:50%;background:#E8B07A"></span><span style="position:absolute;left:5px;bottom:3px;font-size:22px;font-weight:700;line-height:1;color:#F7F5F0">城</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">东京下町散步指南：从谷中到根津</div>
+          <div style="font-size:12px;color:#6B675F;margin-top:4px">排队中 · 等待 Wi-Fi</div>
+        </div>
+        <button aria-label="取消下载" style="width:48px;height:48px;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#6B675F"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:6px 0">
+        <div style="width:48px;height:48px;border-radius:8px;background:#3B4A3F;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:24px;height:24px;border-radius:50%;background:#C9783B"></span><span style="position:absolute;left:5px;bottom:3px;font-size:22px;font-weight:700;line-height:1;color:#F7F5F0">商</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">小店生存法则：从第一家到第三家</div>
+          <div style="font-size:12px;color:#A4561F;margin-top:4px;font-weight:500">下载失败 · 网络中断</div>
+        </div>
+        <button style="height:36px;padding:0 14px;border-radius:18px;background:#EFECE5;font-size:13px;font-weight:600">重试</button>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <h2 style="margin:0;font-size:16px;font-weight:600">已完成 · 8</h2>
+      <span style="font-size:12px;color:#6B675F">断网可播放</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <div style="display:flex;gap:12px;align-items:center;padding:6px 0">
+        <div style="width:48px;height:48px;border-radius:8px;background:#D9C9A8;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:24px;height:24px;border-radius:50%;background:#2E6B66"></span><span style="position:absolute;left:5px;bottom:3px;font-size:22px;font-weight:700;line-height:1;color:#1C1B19">慢</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">慢下来，是一种能力吗？</div><div style="font-size:12px;color:#6B675F;margin-top:4px">慢半拍 · 30.4 MB · 未播放</div></div>
+        <button aria-label="删除下载" style="width:48px;height:48px;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#6B675F"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13"></path></svg></button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:6px 0">
+        <div style="width:48px;height:48px;border-radius:8px;background:#2E6B66;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:24px;height:24px;border-radius:50%;background:#E8D9B8"></span><span style="position:absolute;left:5px;bottom:3px;font-size:22px;font-weight:700;line-height:1;color:#F7F5F0">码</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#6B675F">独立开发者的第一年</div><div style="font-size:12px;color:#6B675F;margin-top:4px">代码与咖啡 · 40.1 MB · 已播放</div></div>
+        <button aria-label="删除下载" style="width:48px;height:48px;border-radius:24px;display:flex;align-items:center;justify-content:center;color:#6B675F"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13"></path></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:16px;right:16px;bottom:20px">
+    <button style="width:100%;height:52px;border-radius:26px;background:#D6E7E3;color:#123A37;font-size:15px;font-weight:600">清理 3 集已播放，释放 210 MB</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

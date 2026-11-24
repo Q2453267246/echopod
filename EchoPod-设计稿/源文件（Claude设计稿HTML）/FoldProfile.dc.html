@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>折叠屏 · 我的与离线下载</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg{display:block}
+input{font:inherit;color:inherit;border:0;outline:0;background:none}
+</style>
+</helmet>
+<div style="width:840px;height:704px;position:relative;overflow:hidden;background:#EFECE5;color:#1C1B19;font-family:Inter,'Noto Sans SC',system-ui,sans-serif;display:flex">
+    <nav aria-label="主导航" style="width:80px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:20px;gap:8px">
+    <a href="FoldImport.dc.html" aria-label="导入播客" style="width:56px;height:56px;border-radius:16px;background:#1C1B19;color:#F7F5F0;display:flex;align-items:center;justify-content:center;margin-bottom:16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="FoldHome.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7V20H15v-6H9v6H3.5z"></path></svg></span>首页</a>
+    <a href="FoldDiscover.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5z"></path></svg></span>发现</a>
+    <a href="FoldListDetail.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"></rect></svg></span>订阅</a>
+    <a href="FoldProfile.dc.html" aria-current="page" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;height:60px"><span style="width:56px;height:32px;border-radius:16px;background:#D6E7E3;color:#123A37;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20.5c1.5-3.6 4.4-5.5 7.5-5.5s6 1.9 7.5 5.5"></path></svg></span>我的</a>
+    </nav>
+
+  <section aria-label="我的" style="width:300px;flex-shrink:0;background:#F7F5F0;border-radius:24px 0 0 24px;margin:8px 0;padding:18px 12px 0;box-sizing:border-box;display:flex;flex-direction:column;gap:12px;overflow:hidden">
+    <div style="padding:0 4px">
+      <h1 style="margin:0;font-size:24px;font-weight:700">我的</h1>
+      <div style="font-size:12px;color:#6B675F;margin-top:2px">本地模式 · 无需登录，数据仅存于本机</div>
+    </div>
+    <a href="FoldStats.dc.html" style="background:#1C1B19;color:#F7F5F0;border-radius:20px;padding:14px 16px;display:flex;align-items:flex-end;justify-content:space-between">
+      <div><div style="font-size:12px;color:#BDB9B0">本周收听</div><div style="margin-top:2px"><span style="font-size:30px;font-weight:700;letter-spacing:-0.8px">12.5</span><span style="font-size:13px;color:#BDB9B0;margin-left:3px">小时 · 18 集</span></div></div>
+      <div style="display:flex;align-items:flex-end;gap:4px;height:34px" aria-hidden="true"><span style="width:7px;height:17px;border-radius:2px;background:#3A3B36"></span><span style="width:7px;height:22px;border-radius:2px;background:#3A3B36"></span><span style="width:7px;height:9px;border-radius:2px;background:#3A3B36"></span><span style="width:7px;height:34px;border-radius:2px;background:#86C6BD"></span><span style="width:7px;height:14px;border-radius:2px;background:#3A3B36"></span><span style="width:7px;height:28px;border-radius:2px;background:#3A3B36"></span><span style="width:7px;height:17px;border-radius:2px;background:#3A3B36"></span></div>
+    </a>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <a href="FoldQueue.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 6h12M4 12h12M4 18h7M18 15v6m-3-3h6"></path></svg><span style="flex:1;font-size:15px;font-weight:500">播放队列</span><span style="font-size:13px;color:#6B675F">5 集</span></a>
+      <a href="FoldProfile.dc.html" aria-current="true" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px;background:#D6E7E3;color:#123A37"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"></path></svg><span style="flex:1;font-size:15px;font-weight:600">离线下载</span><span style="font-size:13px;color:#2E4F4B">8 集</span></a>
+      <a href="FoldProfile.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20z"></path></svg><span style="flex:1;font-size:15px;font-weight:500">我的收藏</span><span style="font-size:13px;color:#6B675F">24 集</span></a>
+      <a href="FoldProfile.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span style="flex:1;font-size:15px;font-weight:500">播放历史</span><span style="font-size:13px;color:#6B675F">30 天</span></a>
+      <a href="FoldStats.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M5 20V11M12 20V4M19 20v-6"></path></svg><span style="flex:1;font-size:15px;font-weight:500">收听统计</span></a>
+      <div style="height:1px;background:#E3DFD6;margin:6px 12px"></div>
+      <a href="FoldImport.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5-5 5 5M12 5v10M5 15v4h14v-4"></path></svg><span style="flex:1;font-size:15px;font-weight:500">导入与导出</span></a>
+      <a href="FoldSettings.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg><span style="flex:1;font-size:15px;font-weight:500">设置</span></a>
+    </div>
+  </section>
+
+  <section aria-label="离线下载" style="flex:1;min-width:0;background:#FFFFFF;border-radius:0 24px 24px 0;margin:8px 8px 8px 0;padding:20px 20px 0;box-sizing:border-box;position:relative;display:flex;flex-direction:column;gap:12px;overflow:hidden;border-left:1px solid #E3DFD6">
+    <div style="display:flex;align-items:center;justify-content:space-between"><h2 style="margin:0;font-size:20px;font-weight:700">离线下载</h2><a href="FoldSettings.dc.html" style="height:40px;display:flex;align-items:center;font-size:13px;font-weight:600;color:#2E6B66">下载设置</a></div>
+    <div style="background:#F7F5F0;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:600">1.2 GB <span style="font-weight:400;color:#6B675F;font-size:12px">应用专属存储</span></span><span style="font-size:12px;color:#6B675F">设备可用 18.4 GB</span></div>
+      <div style="height:8px;border-radius:4px;background:#E3DFD6;overflow:hidden;display:flex"><span style="width:22%;background:#2E6B66"></span><span style="width:4%;background:#86C6BD"></span></div>
+      <div style="font-size:12px;color:#6B675F">仅 Wi-Fi · 同时 2 个 · 已播放自动清理：关</div>
+    </div>
+    <h3 style="margin:4px 0 0;font-size:14px;font-weight:600">进行中 · 3</h3>
+    <div style="display:flex;flex-direction:column">
+      <div style="display:flex;gap:12px;align-items:center;padding:6px 0">
+        <div style="width:44px;height:44px;border-radius:8px;background:#2E6B66;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;background:#E8D9B8"></span><span style="position:absolute;left:5px;bottom:3px;font-size:20px;font-weight:700;line-height:1;color:#F7F5F0">码</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Compose 重组优化：我们踩过的五个坑</div><div style="height:3px;border-radius:2px;background:#E3DFD6;margin-top:6px;overflow:hidden"><div style="width:64%;height:100%;background:#2E6B66"></div></div><div style="font-size:12px;color:#6B675F;margin-top:4px;font-variant-numeric:tabular-nums">22.5 / 35.2 MB · 1.8 MB/s</div></div>
+        <button aria-label="暂停下载" style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect><rect x="13.9" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect></svg></button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:6px 0">
+        <div style="width:44px;height:44px;border-radius:8px;background:#8C4A3C;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;background:#E8B07A"></span><span style="position:absolute;left:5px;bottom:3px;font-size:20px;font-weight:700;line-height:1;color:#F7F5F0">城</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">东京下町散步指南：从谷中到根津</div><div style="font-size:12px;color:#6B675F;margin-top:3px">排队中 · 等待 Wi-Fi</div></div>
+        <button aria-label="取消下载" style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;color:#6B675F"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:6px 0">
+        <div style="width:44px;height:44px;border-radius:8px;background:#3B4A3F;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;background:#C9783B"></span><span style="position:absolute;left:5px;bottom:3px;font-size:20px;font-weight:700;line-height:1;color:#F7F5F0">商</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">小店生存法则：从第一家到第三家</div><div style="font-size:12px;color:#A4561F;margin-top:3px;font-weight:500">下载失败 · 网络中断</div></div>
+        <button style="height:36px;padding:0 14px;border-radius:18px;background:#EFECE5;font-size:13px;font-weight:600">重试</button>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px"><h3 style="margin:0;font-size:14px;font-weight:600">已完成 · 8</h3><span style="font-size:12px;color:#6B675F">断网可播放</span></div>
+    <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:8px">
+      <div style="display:flex;gap:10px;align-items:center;background:#F7F5F0;border-radius:14px;padding:8px"><div style="width:40px;height:40px;border-radius:8px;background:#D9C9A8;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-6px;top:-6px;width:20px;height:20px;border-radius:50%;background:#2E6B66"></span><span style="position:absolute;left:4px;bottom:3px;font-size:19px;font-weight:700;line-height:1;color:#1C1B19">慢</span></div><div style="min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">慢下来，是一种能力吗？</div><div style="font-size:12px;color:#6B675F">30.4 MB · 未播放</div></div></div>
+      <div style="display:flex;gap:10px;align-items:center;background:#F7F5F0;border-radius:14px;padding:8px"><div style="width:40px;height:40px;border-radius:8px;background:#2E6B66;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-6px;top:-6px;width:20px;height:20px;border-radius:50%;background:#E8D9B8"></span><span style="position:absolute;left:4px;bottom:3px;font-size:19px;font-weight:700;line-height:1;color:#F7F5F0">码</span></div><div style="min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#6B675F">独立开发者的第一年</div><div style="font-size:12px;color:#6B675F">40.1 MB · 已播放</div></div></div>
+    </div>
+    <button style="position:absolute;left:20px;right:20px;bottom:16px;height:48px;border-radius:24px;background:#D6E7E3;color:#123A37;font-size:15px;font-weight:600">清理 3 集已播放，释放 210 MB</button>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":840,"height":704}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

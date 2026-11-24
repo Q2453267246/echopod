@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>搜索结果</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg{display:block}
+input{font:inherit;color:inherit;border:0;outline:0;background:none}
+</style>
+</helmet>
+<div style="width:390px;height:844px;position:relative;overflow:hidden;background:#F7F5F0;color:#1C1B19;font-family:Inter,'Noto Sans SC',system-ui,sans-serif">
+  <div style="padding:20px 16px 0;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:4px;padding-top:8px">
+      <a href="Discover.dc.html" aria-label="返回" style="width:48px;height:48px;margin-left:-12px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+      <label style="flex:1;height:52px;border-radius:26px;background:#FFFFFF;border:1.5px solid #2E6B66;display:flex;align-items:center;gap:10px;padding:0 8px 0 16px;box-sizing:border-box">
+        <span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">搜索播客</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B675F" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input value="代码" style="flex:1;min-width:0;font-size:15px">
+        <button aria-label="清除" style="width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;color:#6B675F"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+      </label>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button style="height:36px;padding:0 14px;border-radius:18px;background:#1C1B19;color:#F7F5F0;font-size:13px;font-weight:500">节目 24</button>
+      <button style="height:36px;padding:0 14px;border-radius:18px;background:#EFECE5;font-size:13px;font-weight:500">主播 3</button>
+      <span style="margin-left:auto;font-size:12px;color:#6B675F;align-self:center;display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:50%;border:2px solid #D6E7E3;border-top-color:#2E6B66;box-sizing:border-box"></span>更新结果中</span>
+    </div>
+
+    <div style="display:flex;flex-direction:column">
+      <a href="PodcastDetail.dc.html" style="display:flex;gap:12px;align-items:center;padding:8px 0">
+        <div style="width:64px;height:64px;border-radius:12px;background:#2E6B66;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-10px;top:-10px;width:32px;height:32px;border-radius:50%;background:#E8D9B8"></span><span style="position:absolute;left:7px;bottom:5px;font-size:30px;font-weight:700;line-height:1;color:#F7F5F0">码</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600"><span style="color:#2E6B66">代码</span>与咖啡</div><div style="font-size:12px;color:#6B675F;margin-top:3px">阿哲 &amp; 小林</div><div style="font-size:12px;color:#6B675F;margin-top:2px">科技 · 142 集 · 每周更新</div></div>
+        <span style="height:36px;padding:0 12px;border-radius:18px;background:#D6E7E3;color:#123A37;font-size:13px;font-weight:600;display:flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>已订阅</span>
+      </a>
+      <div style="display:flex;gap:12px;align-items:center;padding:8px 0">
+        <div style="width:64px;height:64px;border-radius:12px;background:#1C1B19;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-10px;top:-10px;width:32px;height:32px;border-radius:50%;background:#86C6BD"></span><span style="position:absolute;left:7px;bottom:5px;font-size:30px;font-weight:700;line-height:1;color:#F7F5F0">外</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600"><span style="color:#2E6B66">代码</span>之外</div><div style="font-size:12px;color:#6B675F;margin-top:3px">独立开发者周刊</div><div style="font-size:12px;color:#6B675F;margin-top:2px">科技 · 86 集</div></div>
+        <button style="height:36px;padding:0 16px;border-radius:18px;background:#2E6B66;color:#FFFFFF;font-size:13px;font-weight:600">订阅</button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:8px 0">
+        <div style="width:64px;height:64px;border-radius:12px;background:#D9C9A8;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-10px;top:-10px;width:32px;height:32px;border-radius:50%;background:#8C4A3C"></span><span style="position:absolute;left:7px;bottom:5px;font-size:30px;font-weight:700;line-height:1;color:#1C1B19">啡</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">咖啡馆里写<span style="color:#2E6B66">代码</span></div><div style="font-size:12px;color:#6B675F;margin-top:3px">Mia</div><div style="font-size:12px;color:#6B675F;margin-top:2px">生活 · 53 集</div></div>
+        <button style="height:36px;padding:0 16px;border-radius:18px;background:#2E6B66;color:#FFFFFF;font-size:13px;font-weight:600">订阅</button>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;padding:8px 0">
+        <div style="width:64px;height:64px;border-radius:12px;background:#5B5F97;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-10px;top:-10px;width:32px;height:32px;border-radius:50%;background:#B9BCE6"></span><span style="position:absolute;left:7px;bottom:5px;font-size:30px;font-weight:700;line-height:1;color:#F7F5F0">猫</span></div>
+        <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">写<span style="color:#2E6B66">代码</span>的猫</div><div style="font-size:12px;color:#6B675F;margin-top:3px">猫叔</div><div style="font-size:12px;color:#6B675F;margin-top:2px">科技 · 31 集</div></div>
+        <button style="height:36px;padding:0 16px;border-radius:18px;background:#2E6B66;color:#FFFFFF;font-size:13px;font-weight:600">订阅</button>
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border-radius:16px;padding:12px 8px 12px 16px;display:flex;align-items:center;gap:12px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A4561F" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5v5.5M12 16.5v.01"></path></svg>
+      <div style="flex:1;font-size:13px;line-height:1.45"><span style="font-weight:600">海外目录暂时无法连接</span><br><span style="color:#6B675F">已显示本地与国内目录结果</span></div>
+      <button style="height:40px;padding:0 14px;border-radius:20px;font-size:13px;font-weight:600;color:#2E6B66">重试</button>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:8px;right:8px;bottom:88px;height:64px;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 6px rgba(28,27,25,.06),0 10px 28px rgba(28,27,25,.10);display:flex;align-items:center;padding:0 4px 0 10px;gap:10px;overflow:hidden">
+    <a href="Player.dc.html" style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;height:64px">
+      <div style="width:44px;height:44px;border-radius:8px;background:#2E3A59;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;background:#C9783B"></span><span style="position:absolute;left:5px;bottom:3px;font-size:20px;font-weight:700;line-height:1;color:#F7F5F0">夜</span></div>
+      <div style="min-width:0">
+        <div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">在深夜写代码的人，都在想些什么</div>
+        <div style="font-size:12px;color:#6B675F">夜航电台 · 1.2x</div>
+      </div>
+    </a>
+    <button aria-label="暂停" style="width:48px;height:48px;border-radius:24px;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect><rect x="13.9" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect></svg></button>
+    <div style="position:absolute;left:12px;right:12px;bottom:0;height:2px;background:#E3DFD6"><div style="width:62%;height:100%;background:#2E6B66"></div></div>
+  </div>
+
+  <nav aria-label="主导航" style="position:absolute;left:0;right:0;bottom:0;height:80px;background:#EFECE5;display:grid;grid-template-columns:repeat(4, minmax(0, 1fr))">
+    <a href="Main.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:12px;font-size:12px;font-weight:500;color:#6B675F"><span style="width:64px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7V20H15v-6H9v6H3.5z"></path></svg></span>首页</a>
+    <a href="Discover.dc.html" aria-current="page" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:12px;font-size:12px;font-weight:600"><span style="width:64px;height:32px;border-radius:16px;background:#D6E7E3;color:#123A37;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5z"></path></svg></span>发现</a>
+    <a href="Subscriptions.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:12px;font-size:12px;font-weight:500;color:#6B675F"><span style="width:64px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"></rect></svg></span>订阅</a>
+    <a href="Profile.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:12px;font-size:12px;font-weight:500;color:#6B675F"><span style="width:64px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20.5c1.5-3.6 4.4-5.5 7.5-5.5s6 1.9 7.5 5.5"></path></svg></span>我的</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

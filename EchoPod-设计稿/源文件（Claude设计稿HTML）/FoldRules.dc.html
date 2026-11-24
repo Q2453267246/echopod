@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>折叠屏适配规则</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+svg{display:block}
+</style>
+</helmet>
+<div style="width:560px;box-sizing:border-box;padding:36px 32px;background:#F7F5F0;color:#1C1B19;font-family:Inter,'Noto Sans SC',system-ui,sans-serif;display:flex;flex-direction:column;gap:24px">
+  <header>
+    <div style="font-size:12px;font-weight:600;color:#2E6B66;letter-spacing:1px">ADAPTIVE LAYOUT</div>
+    <h1 style="margin:8px 0 0;font-size:28px;font-weight:700">折叠屏适配规则</h1>
+    <p style="margin:8px 0 0;font-size:14px;line-height:1.6;color:#4A4741">按窗口宽度切换布局，不按设备型号判断。颜色、字号、组件与手机端完全一致，只改变排布。</p>
+  </header>
+
+  <section style="display:flex;flex-direction:column;gap:10px">
+    <h2 style="margin:0;font-size:13px;font-weight:600;color:#6B675F">窗口尺寸 → 布局</h2>
+    <div style="background:#FFFFFF;border-radius:20px;padding:16px;display:flex;gap:16px;align-items:center">
+      <div style="width:96px;display:flex;justify-content:center;flex-shrink:0" aria-hidden="true"><div style="width:40px;height:72px;border-radius:7px;border:2px solid #1C1B19;position:relative;overflow:hidden;box-sizing:border-box"><span style="position:absolute;left:3px;right:3px;top:4px;height:20px;border-radius:3px;background:#D6E7E3"></span><span style="position:absolute;left:3px;right:3px;top:27px;height:8px;border-radius:2px;background:#E3DFD6"></span><span style="position:absolute;left:3px;right:3px;bottom:12px;height:7px;border-radius:2px;background:#2E6B66"></span><span style="position:absolute;left:0;right:0;bottom:0;height:9px;background:#EFECE5"></span></div></div>
+      <div><div style="font-size:15px;font-weight:600">Compact · &lt; 600 dp</div><div style="font-size:12px;color:#6B675F;margin-top:2px">外屏、普通手机</div><div style="font-size:13px;line-height:1.5;margin-top:6px">底部导航 + 单栏；迷你播放器在导航栏上方</div></div>
+    </div>
+    <div style="background:#FFFFFF;border-radius:20px;padding:16px;display:flex;gap:16px;align-items:center">
+      <div style="width:96px;display:flex;justify-content:center;flex-shrink:0" aria-hidden="true"><div style="width:66px;height:76px;border-radius:7px;border:2px solid #1C1B19;position:relative;overflow:hidden;box-sizing:border-box"><span style="position:absolute;left:0;top:0;bottom:0;width:10px;background:#EFECE5"></span><span style="position:absolute;left:14px;right:4px;top:5px;height:16px;border-radius:3px;background:#D6E7E3"></span><span style="position:absolute;left:14px;width:21px;top:25px;height:16px;border-radius:2px;background:#E3DFD6"></span><span style="position:absolute;left:37px;width:21px;top:25px;height:16px;border-radius:2px;background:#E3DFD6"></span><span style="position:absolute;left:14px;right:4px;bottom:5px;height:8px;border-radius:2px;background:#2E6B66"></span></div></div>
+      <div><div style="font-size:15px;font-weight:600">Medium · 600–839 dp</div><div style="font-size:12px;color:#6B675F;margin-top:2px">展开竖向（约 704 × 840）</div><div style="font-size:13px;line-height:1.5;margin-top:6px">侧边导航栏 Rail；首页订阅 5 列、更新 2 列；搜索框常驻页头；迷你播放器加快退/快进</div></div>
+    </div>
+    <div style="background:#FFFFFF;border-radius:20px;padding:16px;display:flex;gap:16px;align-items:center">
+      <div style="width:96px;display:flex;justify-content:center;flex-shrink:0" aria-hidden="true"><div style="width:92px;height:66px;border-radius:7px;border:2px solid #1C1B19;position:relative;overflow:hidden;box-sizing:border-box"><span style="position:absolute;left:0;top:0;bottom:0;width:10px;background:#EFECE5"></span><span style="position:absolute;left:13px;width:28px;top:4px;bottom:4px;border-radius:3px;background:#E3DFD6"></span><span style="position:absolute;left:44px;right:4px;top:4px;bottom:4px;border-radius:3px;background:#D6E7E3"></span><span style="position:absolute;left:47px;right:7px;bottom:7px;height:7px;border-radius:2px;background:#2E6B66"></span></div></div>
+      <div><div style="font-size:15px;font-weight:600">Expanded · ≥ 840 dp</div><div style="font-size:12px;color:#6B675F;margin-top:2px">展开横向（约 840 × 704）、平板</div><div style="font-size:13px;line-height:1.5;margin-top:6px">Rail + 列表 / 详情双栏；迷你播放器停靠在详情栏底部；播放器左控制、右章节</div></div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:10px">
+    <h2 style="margin:0;font-size:13px;font-weight:600;color:#6B675F">折叠姿态</h2>
+    <div style="background:#FFFFFF;border-radius:20px;padding:16px;display:flex;gap:16px;align-items:center">
+      <div style="width:96px;display:flex;justify-content:center;flex-shrink:0" aria-hidden="true"><div style="width:92px;height:62px;border-radius:7px;border:2px solid #1C1B19;position:relative;overflow:hidden;box-sizing:border-box;background:#2E3A59"><span style="position:absolute;left:8px;top:6px;width:18px;height:18px;border-radius:3px;background:#C9783B"></span><span style="position:absolute;left:0;right:0;top:28px;border-top:2px dashed #F7F5F0"></span><span style="position:absolute;left:30px;right:30px;bottom:8px;height:12px;border-radius:6px;background:#F7F5F0"></span></div></div>
+      <div><div style="font-size:15px;font-weight:600">半折叠 · 桌面模式</div><div style="font-size:13px;line-height:1.5;margin-top:4px">横向铰链：上屏看封面与标题，下屏放进度和按钮；任何控件都不跨铰链</div></div>
+    </div>
+    <div style="background:#FFFFFF;border-radius:20px;padding:16px;display:flex;gap:16px;align-items:center">
+      <div style="width:96px;display:flex;justify-content:center;flex-shrink:0" aria-hidden="true"><div style="width:92px;height:62px;border-radius:7px;border:2px solid #1C1B19;position:relative;overflow:hidden;box-sizing:border-box"><span style="position:absolute;left:4px;width:36px;top:4px;bottom:4px;border-radius:3px;background:#E3DFD6"></span><span style="position:absolute;top:0;bottom:0;left:43px;border-left:2px dashed #1C1B19"></span><span style="position:absolute;left:48px;right:4px;top:4px;bottom:4px;border-radius:3px;background:#D6E7E3"></span></div></div>
+      <div><div style="font-size:15px;font-weight:600">书本模式</div><div style="font-size:13px;line-height:1.5;margin-top:4px">纵向铰链：双栏分界线对齐铰链，列表在左、详情在右</div></div>
+    </div>
+  </section>
+
+  <section style="background:#1C1B19;color:#F7F5F0;border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:15px;font-weight:600">展开 / 折叠时的连续性</div>
+    <div style="font-size:13px;line-height:1.6;color:#D6D2C9">播放不中断；保留滚动位置、当前选中的节目与筛选条件。折叠回外屏时，详情栏的节目变成单栏的当前页。</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      <span style="height:26px;padding:0 10px;border-radius:13px;background:#2E2F2B;font-size:12px;display:flex;align-items:center;font-family:ui-monospace,Menlo,monospace">currentWindowAdaptiveInfo()</span>
+      <span style="height:26px;padding:0 10px;border-radius:13px;background:#2E2F2B;font-size:12px;display:flex;align-items:center;font-family:ui-monospace,Menlo,monospace">NavigationSuiteScaffold</span>
+      <span style="height:26px;padding:0 10px;border-radius:13px;background:#2E2F2B;font-size:12px;display:flex;align-items:center;font-family:ui-monospace,Menlo,monospace">ListDetailPaneScaffold</span>
+      <span style="height:26px;padding:0 10px;border-radius:13px;background:#2E2F2B;font-size:12px;display:flex;align-items:center;font-family:ui-monospace,Menlo,monospace">FoldingFeature</span>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":560,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

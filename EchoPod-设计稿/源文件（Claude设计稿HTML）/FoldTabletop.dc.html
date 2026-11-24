@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>折叠屏 · 半折叠桌面模式播放器</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg{display:block}
+</style>
+</helmet>
+<div style="width:840px;height:704px;position:relative;overflow:hidden;color:#FFFFFF;font-family:Inter,'Noto Sans SC',system-ui,sans-serif;background:#141A29">
+  <div style="position:absolute;left:0;right:0;top:0;height:340px;background:linear-gradient(180deg, #46557F 0%, #26304A 100%);display:flex;align-items:center;gap:36px;padding:0 56px;box-sizing:border-box">
+    <a href="FoldHome.dc.html" aria-label="收起播放器" style="position:absolute;left:8px;top:8px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></a>
+    <button aria-label="更多" style="position:absolute;right:8px;top:8px;width:48px;height:48px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5.5" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="18.5" r="1.6" fill="currentColor"></circle></svg></button>
+    <div style="width:248px;height:248px;border-radius:20px;background:#2E3A59;position:relative;overflow:hidden;flex-shrink:0;box-shadow:0 20px 40px rgba(0,0,0,.35)">
+      <span style="position:absolute;right:-34px;top:-34px;width:124px;height:124px;border-radius:50%;background:#C9783B"></span>
+      <span style="position:absolute;left:24px;bottom:18px;font-size:110px;font-weight:700;line-height:1;color:#F7F5F0">夜</span>
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12px;letter-spacing:1px;color:rgba(255,255,255,.72)">正在播放 · 来自 播放队列</div>
+      <h1 style="margin:10px 0 0;font-size:28px;font-weight:700;line-height:1.3">在深夜写代码的人，都在想些什么</h1>
+      <div style="font-size:15px;color:rgba(255,255,255,.78);margin-top:8px">夜航电台 · 第 87 期</div>
+      <div style="display:inline-flex;align-items:center;gap:8px;margin-top:18px;height:32px;padding:0 12px;border-radius:16px;background:rgba(255,255,255,.14);font-size:13px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"></path></svg>章节 3 / 6 · 结对编程的夜晚</div>
+    </div>
+  </div>
+
+  <div aria-hidden="true" style="position:absolute;left:0;right:0;top:340px;height:24px;background:#0E1320;display:flex;align-items:center;justify-content:center">
+    <span style="position:absolute;left:0;right:0;top:12px;border-top:1px dashed rgba(255,255,255,.22)"></span>
+    <span style="position:relative;background:#0E1320;padding:0 10px;font-size:11px;color:rgba(255,255,255,.6);letter-spacing:1px">铰链 · 内容避开此区域</span>
+  </div>
+
+  <div style="position:absolute;left:0;right:0;top:364px;bottom:0;padding:28px 56px 0;box-sizing:border-box;display:flex;flex-direction:column;gap:18px">
+    <div>
+      <div style="height:20px;position:relative;display:flex;align-items:center" role="slider" aria-label="播放进度" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" tabindex="0">
+        <div style="position:absolute;left:0;right:0;height:6px;border-radius:3px;background:rgba(255,255,255,.2)"></div>
+        <div style="position:absolute;left:0;width:62%;height:6px;border-radius:3px;background:#FFFFFF"></div>
+        <div style="position:absolute;left:calc(62% - 9px);width:18px;height:18px;border-radius:50%;background:#FFFFFF"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.75);font-variant-numeric:tabular-nums;margin-top:6px"><span>38:12</span><span>-22:53</span></div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:center;gap:40px">
+      <button aria-label="上一集" style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8)"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 6v12L8.5 12z" fill="currentColor"></path><rect x="6" y="6" width="2.2" height="12" rx="1" fill="currentColor"></rect></svg></button>
+      <button aria-label="快退 15 秒" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"></path><path d="M4 3.5v3.7h3.7"></path><text x="12.2" y="15.2" text-anchor="middle" font-size="6.8" font-weight="700" fill="currentColor" stroke="none" font-family="Inter">15</text></svg></button>
+      <button aria-label="暂停" style="width:84px;height:84px;border-radius:42px;background:#FFFFFF;color:#141A29;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect><rect x="13.9" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect></svg></button>
+      <button aria-label="快进 30 秒" style="width:64px;height:64px;display:flex;align-items:center;justify-content:center"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"></path><path d="M20 3.5v3.7h-3.7"></path><text x="11.8" y="15.2" text-anchor="middle" font-size="6.8" font-weight="700" fill="currentColor" stroke="none" font-family="Inter">30</text></svg></button>
+      <button aria-label="下一集" style="width:56px;height:56px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.8)"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6v12l8.5-6z" fill="currentColor"></path><rect x="15.8" y="6" width="2.2" height="12" rx="1" fill="currentColor"></rect></svg></button>
+    </div>
+
+    <div style="display:flex;justify-content:center;gap:12px">
+      <button style="height:48px;padding:0 18px;border-radius:24px;background:rgba(255,255,255,.12);font-size:14px;font-weight:700">1.2x</button>
+      <button style="height:48px;padding:0 16px;border-radius:24px;background:rgba(255,255,255,.12);font-size:14px;display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10z"></path></svg>定时</button>
+      <button style="height:48px;padding:0 16px;border-radius:24px;background:rgba(255,255,255,.12);font-size:14px;display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7a4.3 4.3 0 0 1 7.5 2.8C19.5 15.4 12 20 12 20z"></path></svg>收藏</button>
+      <a href="FoldQueue.dc.html" style="height:48px;padding:0 16px;border-radius:24px;background:rgba(255,255,255,.12);font-size:14px;display:flex;align-items:center;gap:6px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>队列 4</a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":840,"height":704}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

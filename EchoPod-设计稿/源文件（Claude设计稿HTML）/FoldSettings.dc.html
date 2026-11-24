@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>折叠屏 · 设置</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg{display:block}
+input{font:inherit;color:inherit;border:0;outline:0;background:none}
+</style>
+</helmet>
+<div style="width:840px;height:704px;position:relative;overflow:hidden;background:#EFECE5;color:#1C1B19;font-family:Inter,'Noto Sans SC',system-ui,sans-serif;display:flex">
+    <nav aria-label="主导航" style="width:80px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:20px;gap:8px">
+    <a href="FoldImport.dc.html" aria-label="导入播客" style="width:56px;height:56px;border-radius:16px;background:#1C1B19;color:#F7F5F0;display:flex;align-items:center;justify-content:center;margin-bottom:16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="FoldHome.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7V20H15v-6H9v6H3.5z"></path></svg></span>首页</a>
+    <a href="FoldDiscover.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5z"></path></svg></span>发现</a>
+    <a href="FoldListDetail.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"></rect></svg></span>订阅</a>
+    <a href="FoldProfile.dc.html" aria-current="page" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;height:60px"><span style="width:56px;height:32px;border-radius:16px;background:#D6E7E3;color:#123A37;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20.5c1.5-3.6 4.4-5.5 7.5-5.5s6 1.9 7.5 5.5"></path></svg></span>我的</a>
+    </nav>
+
+  <section aria-label="设置分类" style="width:260px;flex-shrink:0;background:#F7F5F0;border-radius:24px 0 0 24px;margin:8px 0;padding:14px 12px 0;box-sizing:border-box;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:4px">
+      <a href="FoldProfile.dc.html" aria-label="返回" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+      <h1 style="margin:0;font-size:22px;font-weight:700">设置</h1>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <a href="FoldSettings.dc.html" aria-current="true" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px;background:#D6E7E3;color:#123A37"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"></path></svg><span style="font-size:15px;font-weight:600">外观</span></a>
+      <a href="FoldSettings.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M10 8.5v7l5.5-3.5z" fill="currentColor"></path></svg><span style="font-size:15px;font-weight:500">播放</span></a>
+      <a href="FoldSettings.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m-5-5 5 5 5-5M5 20h14"></path></svg><span style="font-size:15px;font-weight:500">下载</span></a>
+      <a href="FoldSettings.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7"></path><path d="M20 4v4h-4"></path></svg><span style="font-size:15px;font-weight:500">订阅与刷新</span></a>
+      <a href="FoldSettings.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.5"></ellipse><path d="M5 6v12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V6M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"></path></svg><span style="font-size:15px;font-weight:500">数据与备份</span></a>
+      <a href="FoldSettings.dc.html" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border-radius:16px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5.5M12 7.5v.01"></path></svg><span style="font-size:15px;font-weight:500">关于</span></a>
+    </div>
+  </section>
+
+  <section aria-label="外观设置" style="flex:1;min-width:0;background:#FFFFFF;border-radius:0 24px 24px 0;margin:8px 8px 8px 0;padding:22px 24px 0;box-sizing:border-box;display:flex;flex-direction:column;gap:18px;overflow:hidden;border-left:1px solid #E3DFD6">
+    <h2 style="margin:0;font-size:20px;font-weight:700">外观</h2>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:14px;font-weight:600">主题模式</div>
+      <div role="radiogroup" aria-label="主题模式" style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:12px">
+        <sc-for list="{{themes}}" as="t" hint-placeholder-count="3">
+          <button role="radio" aria-checked="{{t.checked}}" onClick="{{t.pick}}" style="display:flex;flex-direction:column;gap:8px;text-align:left">
+            <span style="display:flex;width:100%;height:92px;border-radius:14px;overflow:hidden;border:2px solid {{t.ring}};box-sizing:border-box;transition:border-color 200ms">
+              <span style="flex:1;background:{{t.leftBg}};padding:10px 8px;display:flex;flex-direction:column;gap:6px"><span style="height:18px;border-radius:4px;background:{{t.leftCard}}"></span><span style="height:6px;width:70%;border-radius:3px;background:{{t.leftLine}}"></span><span style="height:6px;width:50%;border-radius:3px;background:{{t.leftLine}}"></span></span>
+              <span style="flex:1;background:{{t.rightBg}};padding:10px 8px;display:flex;flex-direction:column;gap:6px"><span style="height:18px;border-radius:4px;background:{{t.rightCard}}"></span><span style="height:6px;width:70%;border-radius:3px;background:{{t.rightLine}}"></span><span style="height:6px;width:50%;border-radius:3px;background:{{t.rightLine}}"></span></span>
+            </span>
+            <span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:{{t.weight}}"><span style="width:18px;height:18px;border-radius:9px;border:2px solid {{t.dot}};box-sizing:border-box;display:flex;align-items:center;justify-content:center"><span style="width:8px;height:8px;border-radius:4px;background:{{t.fill}}"></span></span>{{t.label}}</span>
+          </button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="background:#F7F5F0;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:14px">
+      <div style="flex:1"><div style="font-size:15px;font-weight:500">动态封面取色</div><div style="font-size:12px;color:#6B675F;margin-top:2px">播放器背景跟随当前节目封面的主色</div></div>
+      <button role="switch" aria-checked="true" aria-label="动态封面取色" style="width:52px;height:32px;border-radius:16px;background:#2E6B66;position:relative;flex-shrink:0"><span style="position:absolute;right:4px;top:4px;width:24px;height:24px;border-radius:12px;background:#FFFFFF"></span></button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="font-size:14px;font-weight:600">首页布局</div>
+      <div role="radiogroup" aria-label="首页布局" style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:12px">
+        <button role="radio" aria-checked="true" style="border:2px solid #2E6B66;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;text-align:left">
+          <span style="display:grid;grid-template-columns:repeat(2, 22px);gap:4px" aria-hidden="true"><span style="height:22px;border-radius:4px;background:#2E6B66"></span><span style="height:22px;border-radius:4px;background:#8C4A3C"></span><span style="height:22px;border-radius:4px;background:#2E3A59"></span><span style="height:22px;border-radius:4px;background:#D9C9A8"></span></span>
+          <span><span style="display:block;font-size:14px;font-weight:600">卡片式</span><span style="display:block;font-size:12px;color:#6B675F;margin-top:2px">突出封面（默认）</span></span>
+        </button>
+        <button role="radio" aria-checked="false" style="border:2px solid #E3DFD6;border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;text-align:left">
+          <span style="display:flex;flex-direction:column;gap:5px;width:48px" aria-hidden="true"><span style="height:9px;border-radius:3px;background:#BDB9B0"></span><span style="height:9px;border-radius:3px;background:#D6D2C9"></span><span style="height:9px;border-radius:3px;background:#D6D2C9"></span><span style="height:9px;border-radius:3px;background:#D6D2C9"></span></span>
+          <span><span style="display:block;font-size:14px;font-weight:500">列表式</span><span style="display:block;font-size:12px;color:#6B675F;margin-top:2px">信息更密集</span></span>
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":840,"height":704}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { theme: 0 };
+  }
+  renderVals() {
+    const cur = (this.state && this.state.theme) || 0;
+    const L = { bg: '#F7F5F0', card: '#FFFFFF', line: '#D6D2C9' };
+    const D = { bg: '#131412', card: '#22231F', line: '#3A3B36' };
+    const defs = [
+      { label: '跟随系统', a: L, b: D },
+      { label: '浅色', a: L, b: L },
+      { label: '深色', a: D, b: D }
+    ];
+    const themes = defs.map((d, i) => {
+      const on = i === cur;
+      return {
+        label: d.label,
+        checked: on ? 'true' : 'false',
+        ring: on ? '#2E6B66' : '#E3DFD6',
+        dot: on ? '#2E6B66' : '#8A867D',
+        fill: on ? '#2E6B66' : 'transparent',
+        weight: on ? 600 : 500,
+        leftBg: d.a.bg, leftCard: d.a.card, leftLine: d.a.line,
+        rightBg: d.b.bg, rightCard: d.b.card, rightLine: d.b.line,
+        pick: () => this.setState({ theme: i })
+      };
+    });
+    return { themes };
+  }
+}
+</script>
+</body>
+</html>
