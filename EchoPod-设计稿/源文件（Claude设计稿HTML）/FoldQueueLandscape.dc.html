@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>折叠屏 · 横向播放队列</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}a:hover{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+svg{display:block}
+input{font:inherit;color:inherit;border:0;outline:0;background:none}
+</style>
+</helmet>
+<div style="width:840px;height:704px;position:relative;overflow:hidden;background:#EFECE5;color:#1C1B19;font-family:Inter,'Noto Sans SC',system-ui,sans-serif;display:flex">
+    <nav aria-label="主导航" style="width:80px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:20px;gap:8px">
+    <a href="FoldImportLandscape.dc.html" aria-label="导入播客" style="width:56px;height:56px;border-radius:16px;background:#1C1B19;color:#F7F5F0;display:flex;align-items:center;justify-content:center;margin-bottom:16px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></a>
+    <a href="FoldHomeLandscape.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10.5 12 3.5l8.5 7V20H15v-6H9v6H3.5z"></path></svg></span>首页</a>
+    <a href="FoldDiscover.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="m15.5 8.5-2 5-5 2 2-5z"></path></svg></span>发现</a>
+    <a href="FoldListDetail.dc.html" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:#6B675F;height:60px"><span style="width:56px;height:32px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.8"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"></rect></svg></span>订阅</a>
+    <a href="FoldProfile.dc.html" aria-current="page" style="display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:600;height:60px"><span style="width:56px;height:32px;border-radius:16px;background:#D6E7E3;color:#123A37;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20.5c1.5-3.6 4.4-5.5 7.5-5.5s6 1.9 7.5 5.5"></path></svg></span>我的</a>
+    </nav>
+
+  <section aria-label="正在播放" style="width:340px;flex-shrink:0;background:#F7F5F0;border-radius:24px 0 0 24px;margin:8px 0;box-sizing:border-box;overflow:hidden;padding:14px 16px 16px;display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;align-items:center;gap:4px;margin-left:-6px">
+      <a href="FoldProfile.dc.html" aria-label="返回" style="width:44px;height:44px;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></a>
+      <h1 style="margin:0;font-size:22px;font-weight:700">播放队列</h1>
+    </div>
+    <div style="background:#FFFFFF;border-radius:24px;border:1px solid #2E6B66;padding:16px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:14px;align-items:center">
+        <div style="width:96px;height:96px;border-radius:14px;background:#2E3A59;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-13px;top:-13px;width:48px;height:48px;border-radius:50%;background:#C9783B"></span><span style="position:absolute;left:10px;bottom:7px;font-size:46px;font-weight:700;line-height:1;color:#F7F5F0">夜</span></div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#2E6B66"><span style="display:flex;align-items:flex-end;gap:2px;height:12px" aria-hidden="true"><span style="width:3px;height:7px;background:#2E6B66;border-radius:1px"></span><span style="width:3px;height:12px;background:#2E6B66;border-radius:1px"></span><span style="width:3px;height:9px;background:#2E6B66;border-radius:1px"></span></span>正在播放</div>
+          <div style="font-size:16px;font-weight:600;line-height:1.35;margin-top:6px">在深夜写代码的人，都在想些什么</div>
+          <div style="font-size:12px;color:#6B675F;margin-top:4px">夜航电台 · 剩余 23 分</div>
+        </div>
+      </div>
+      <div style="height:4px;border-radius:2px;background:#E3DFD6;overflow:hidden"><div style="width:62%;height:100%;background:#2E6B66"></div></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:28px">
+        <button aria-label="快退 15 秒" style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"></path><path d="M4 3.5v3.7h3.7"></path><text x="12.2" y="15.2" text-anchor="middle" font-size="6.8" font-weight="700" fill="currentColor" stroke="none" font-family="Inter">15</text></svg></button>
+        <button aria-label="暂停" style="width:56px;height:56px;border-radius:28px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#2E6B66;color:#FFFFFF"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect><rect x="13.9" y="5" width="3.6" height="14" rx="1.2" fill="currentColor"></rect></svg></button>
+        <button aria-label="快进 30 秒" style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"></path><path d="M20 3.5v3.7h-3.7"></path><text x="11.8" y="15.2" text-anchor="middle" font-size="6.8" font-weight="700" fill="currentColor" stroke="none" font-family="Inter">30</text></svg></button>
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border-radius:20px;padding:4px 14px">
+      <div style="display:flex;align-items:center;gap:12px;min-height:60px;border-bottom:1px solid #EFECE5">
+        <div style="flex:1"><div style="font-size:14px;font-weight:500">自动播放下一集</div><div style="font-size:12px;color:#6B675F;margin-top:2px">播完标记已播放</div></div><span role="switch" aria-checked="true" style="width:52px;height:32px;border-radius:16px;background:#2E6B66;position:relative;flex-shrink:0"><span style="position:absolute;right:4px;top:4px;width:24px;height:24px;border-radius:12px;background:#FFFFFF"></span></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;min-height:56px">
+        <span style="color:#6B675F"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19.5 14.5A8 8 0 1 1 9.5 4.5a6.5 6.5 0 0 0 10 10z"></path></svg></span><div style="flex:1;font-size:14px;font-weight:500">定时关闭</div><span style="font-size:13px;color:#6B675F">关闭</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="接下来" style="flex:1;min-width:0;background:#FFFFFF;border-radius:0 24px 24px 0;margin:8px 8px 8px 0;box-sizing:border-box;position:relative;overflow:hidden;border-left:1px solid #E3DFD6;padding:20px 20px 0;display:flex;flex-direction:column;gap:8px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1"><h2 style="margin:0;font-size:18px;font-weight:600">接下来 · 4 集</h2><div style="font-size:12px;color:#6B675F;margin-top:2px">约 3 小时 12 分</div></div>
+      <button style="height:40px;padding:0 16px;border-radius:20px;background:#EFECE5;font-size:14px;font-weight:600">清空</button>
+    </div>
+    <div style="display:flex;flex-direction:column;margin-top:6px">
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 2px">
+          <span style="width:24px;display:flex;justify-content:center;color:#6B675F"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.7" fill="currentColor"></circle><circle cx="15" cy="6" r="1.7" fill="currentColor"></circle><circle cx="9" cy="12" r="1.7" fill="currentColor"></circle><circle cx="15" cy="12" r="1.7" fill="currentColor"></circle><circle cx="9" cy="18" r="1.7" fill="currentColor"></circle><circle cx="15" cy="18" r="1.7" fill="currentColor"></circle></svg></span>
+          <div style="width:52px;height:52px;border-radius:9px;background:#D9C9A8;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:26px;height:26px;border-radius:50%;background:#2E6B66"></span><span style="position:absolute;left:5px;bottom:4px;font-size:25px;font-weight:700;line-height:1;color:#1C1B19">慢</span></div>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;line-height:1.35">慢下来，是一种能力吗？</div><div style="font-size:12px;color:#6B675F;margin-top:3px">慢半拍 · 42 分钟 · 已下载</div></div>
+          <button aria-label="移出队列" style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#6B675F"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 8px 10px 6px;margin:0 -6px;border-radius:16px;background:#FFFFFF;box-shadow:0 12px 28px rgba(28,27,25,.16)">
+          <span style="width:24px;display:flex;justify-content:center;color:#1C1B19"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.7" fill="currentColor"></circle><circle cx="15" cy="6" r="1.7" fill="currentColor"></circle><circle cx="9" cy="12" r="1.7" fill="currentColor"></circle><circle cx="15" cy="12" r="1.7" fill="currentColor"></circle><circle cx="9" cy="18" r="1.7" fill="currentColor"></circle><circle cx="15" cy="18" r="1.7" fill="currentColor"></circle></svg></span>
+          <div style="width:52px;height:52px;border-radius:9px;background:#2E6B66;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:26px;height:26px;border-radius:50%;background:#E8D9B8"></span><span style="position:absolute;left:5px;bottom:4px;font-size:25px;font-weight:700;line-height:1;color:#F7F5F0">码</span></div>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;line-height:1.35">Compose 重组优化：我们踩过的五个坑</div><div style="font-size:12px;color:#6B675F;margin-top:3px">代码与咖啡 · 拖动中</div></div>
+          <button aria-label="移出队列" style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+        </div>
+        <div style="height:4px;border-radius:2px;background:#2E6B66;margin:6px 16px"></div>
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 2px">
+          <span style="width:24px;display:flex;justify-content:center;color:#6B675F"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.7" fill="currentColor"></circle><circle cx="15" cy="6" r="1.7" fill="currentColor"></circle><circle cx="9" cy="12" r="1.7" fill="currentColor"></circle><circle cx="15" cy="12" r="1.7" fill="currentColor"></circle><circle cx="9" cy="18" r="1.7" fill="currentColor"></circle><circle cx="15" cy="18" r="1.7" fill="currentColor"></circle></svg></span>
+          <div style="width:52px;height:52px;border-radius:9px;background:#8C4A3C;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:26px;height:26px;border-radius:50%;background:#E8B07A"></span><span style="position:absolute;left:5px;bottom:4px;font-size:25px;font-weight:700;line-height:1;color:#F7F5F0">城</span></div>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;line-height:1.35">东京下町散步指南：从谷中到根津</div><div style="font-size:12px;color:#6B675F;margin-top:3px">城市漫游者 · 1 小时 12 分</div></div>
+          <button aria-label="移出队列" style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#6B675F"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+        </div>
+        <div style="display:flex;gap:12px;align-items:center;padding:10px 2px">
+          <span style="width:24px;display:flex;justify-content:center;color:#6B675F"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.7" fill="currentColor"></circle><circle cx="15" cy="6" r="1.7" fill="currentColor"></circle><circle cx="9" cy="12" r="1.7" fill="currentColor"></circle><circle cx="15" cy="12" r="1.7" fill="currentColor"></circle><circle cx="9" cy="18" r="1.7" fill="currentColor"></circle><circle cx="15" cy="18" r="1.7" fill="currentColor"></circle></svg></span>
+          <div style="width:52px;height:52px;border-radius:9px;background:#5B5F97;position:relative;overflow:hidden;flex-shrink:0"><span style="position:absolute;right:-7px;top:-7px;width:26px;height:26px;border-radius:50%;background:#B9BCE6"></span><span style="position:absolute;left:5px;bottom:4px;font-size:25px;font-weight:700;line-height:1;color:#F7F5F0">微</span></div>
+          <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;line-height:1.35">细胞里的快递系统</div><div style="font-size:12px;color:#6B675F;margin-top:3px">微观宇宙 · 剩余 12 分</div></div>
+          <button aria-label="移出队列" style="width:44px;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#6B675F"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"></path></svg></button>
+        </div>
+    </div>
+    <div style="font-size:12px;color:#6B675F;padding:8px 2px">长按拖动排序 · 向左滑动移除</div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":840,"height":704}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
