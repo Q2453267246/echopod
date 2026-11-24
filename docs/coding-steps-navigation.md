@@ -1,234 +1,787 @@
-# EchoPod 编码实施步骤：自适应底部导航栏与折叠屏适配
+# EchoPod 编码步骤：自适应主导航（底部导航栏 + 折叠屏 Rail）
 
-> **参考设计稿**：
-> - 手机首页：[01-首页.png](../EchoPod-设计稿/PNG/01-手机/01-首页.png)
+> 架构：Clean Architecture + MVVM ｜ UI：Jetpack Compose + Material 3
+>
+> 参考设计稿：
+> - 手机首页（Compact）：[01-首页.png](../EchoPod-设计稿/PNG/01-手机/01-首页.png)，HTML：`Main.dc.html`
+> - 折叠屏展开竖向首页（Medium）：[02-首页-竖向.png](../EchoPod-设计稿/PNG/02-折叠屏/02-首页-竖向.png)，HTML：`FoldHome.dc.html`
+> - 折叠屏展开横向首页（Expanded）：[03-首页-横向.png](../EchoPod-设计稿/PNG/02-折叠屏/03-首页-横向.png)，HTML：`FoldHomeLandscape.dc.html`
 > - 折叠屏适配规则：[01-折叠屏适配规则.png](../EchoPod-设计稿/PNG/02-折叠屏/01-折叠屏适配规则.png)
-> - 折叠屏竖向首页（Medium）：[02-首页-竖向.png](../EchoPod-设计稿/PNG/02-折叠屏/02-首页-竖向.png)
-> - 折叠屏横向首页（Expanded）：[03-首页-横向.png](../EchoPod-设计稿/PNG/02-折叠屏/03-首页-横向.png)
-> - 设计语言（Quiet Paper V1.0）：[01-设计语言-QuietPaper.png](../EchoPod-设计稿/PNG/00-设计语言/01-设计语言-QuietPaper.png)
+> - 深色：[14-首页-深色.png](../EchoPod-设计稿/PNG/01-手机/14-首页-深色.png)、[24-首页-深色-竖向.png](../EchoPod-设计稿/PNG/02-折叠屏/24-首页-深色-竖向.png)
 
 ---
 
-## 目标与范围
+## 0. 目标与范围
 
-基于 **Clean Architecture + MVVM** 架构，完成 EchoPod 的应用导航壳层（App Shell）与主题底座：
+**本阶段要交付：** 一个"应用外壳"（App Shell）——根据窗口宽度自动切换导航形态，四个一级页面（首页 / 发现 / 订阅 / 我的）可切换、状态可保留，并为迷你播放器预留位置。
 
-1. **Compact（`< 600dp`，手机 / 折叠屏外屏）**：底部导航栏（`NavigationBar`），4 个一级入口：`首页`、`发现`、`订阅`、`我的`。
-2. **Medium（`600–839dp`，展开竖向）与 Expanded（`>= 840dp`，展开横向 / 平板）**：左侧边导航栏（`NavigationRail`），顶部带 `+` 导入播客 FAB，下方为 4 个一级入口。
-3. **Quiet Paper 浅色 / 深色双主题**：严格遵循设计稿色板、圆角、触控热区（`>= 48dp`）与线性图标规范（`1.8dp` 描边）。
-4. **折叠/展开状态连续性**：切换屏幕形态时不丢失当前选中 Tab、页面滚动位置与导航状态。
+| 窗口宽度 | 导航形态 | 其他 |
+|---|---|---|
+| Compact `< 600dp`（手机、折叠屏外屏） | 底部 `NavigationBar` | 迷你播放器悬浮在导航栏上方；"导入"按钮在首页标题栏 |
+| Medium `600–839dp`（展开竖持 ≈704×840） | 左侧 `NavigationRail`（88dp），顶部 `+` 导入 FAB | 迷你播放器悬浮在内容区底部 |
+| Expanded `≥ 840dp`（展开横持 ≈840×704、平板） | 左侧 `NavigationRail`（80dp，**不换成 Drawer**），顶部 `+` FAB | 内容区是带圆角的"纸面"，后续接双栏 |
+
+**本阶段不做（只预留接口）：** 真实播放（Media3）、`ListDetailPaneScaffold` 双栏、桌面/书本姿态布局、各页面真实内容。
+
+**完成标准：**
+1. 三种宽度下导航形态、尺寸、颜色与设计稿一致（浅色 + 深色）。
+2. 展开/折叠、旋转、分屏拖动窗口时：当前 Tab 不变，各 Tab 的滚动位置不丢。
+3. `./gradlew :app:assembleDebug` 与 `./gradlew :app:testDebugUnitTest` 通过。
 
 ---
 
-## Step 0：Clean Architecture + MVVM 目录规划
+## 1. 设计稿规格（从 HTML 源文件中提取）
 
-在 `app/src/main/java/com/echopod/` 下按分层建立清晰边界，确保依赖方向严格为 `presentation -> domain <- data`（`domain` 层禁止引入 Android / Compose 依赖）：
+以下数值直接来自 `.dc.html` 源码，比看 PNG 估算更准确。
+
+### 1.1 Compact 底部导航栏（`Main.dc.html`）
+
+| 项 | 值 |
+|---|---|
+| 容器 | 高 `80dp`（不含系统手势条 inset），背景 `#EFECE5` / 深色 `#2A2B27`，4 等分 |
+| 单项 | 纵向排列，`padding-top 12dp`，图标与文字间距 `4dp` |
+| 选中指示器 | `64×32dp`，圆角 `16dp`，背景 `#D6E7E3` / `#1F3B38` |
+| 图标 | `22dp`（24 视口），描边 `1.8`（选中态 `1.9`） |
+| 选中 | 图标 `#123A37` / `#BFE3DD`；文字 `12sp` SemiBold(600)，颜色 `#1C1B19` / `#ECEAE4` |
+| 未选中 | 图标与文字 `#6B675F` / `#A3A098`；文字 `12sp` Medium(500) |
+| 迷你播放器 | 左右各 `8dp`，底边距导航栏顶部 `8dp`，高 `64dp`，圆角 `16dp`，白底 + 阴影 |
+
+### 1.2 Medium Rail（`FoldHome.dc.html`）
+
+| 项 | 值 |
+|---|---|
+| 容器 | 宽 `88dp`，背景 `#EFECE5` / `#2A2B27`，`padding-top 28dp`，子项间距 `12dp` |
+| 导入 FAB | `56×56dp`，圆角 `16dp`，背景 `#1C1B19` / `#ECEAE4`，图标 `#F7F5F0` / `#131412`，下方额外间距 `20dp` |
+| 单项 | 高 `60dp`，指示器 `56×32dp` 圆角 `16dp`，其余颜色/字号同 Compact |
+| 内容区 | 背景 `#F7F5F0`，直接铺满 Rail 右侧 |
+| 迷你播放器 | 内容区内悬浮：左右 `24dp`、底 `16dp`，高 `68dp`，圆角 `18dp`，多出"快退 15 / 快进 30"按钮 |
+
+### 1.3 Expanded Rail（`FoldHomeLandscape.dc.html`）
+
+| 项 | 值 |
+|---|---|
+| 整窗背景 | `#EFECE5`（Rail 自己**无背景**，透出整窗底色） |
+| Rail | 宽 `80dp`，`padding-top 20dp`，子项间距 `8dp`；FAB 下方额外间距 `16dp` |
+| 内容区 | 像一张"纸"：上下右外边距 `8dp`，圆角 `24dp`，背景 `#F7F5F0` |
+| 迷你播放器 | 停靠在右侧详情栏底部（属于首页双栏布局，本阶段不实现） |
+
+> AGENTS.md 规定 Medium Rail 为 88dp；Expanded 的 80dp 以设计稿为准，两者不冲突。
+
+### 1.4 图标 SVG 路径（24×24 视口，圆角端点/连接）
+
+| 图标 | path |
+|---|---|
+| 首页 | `M3.5 10.5 12 3.5l8.5 7V20H15v-6H9v6H3.5z` |
+| 发现 | 圆 `cx=12 cy=12 r=9` + `m15.5 8.5-2 5-5 2 2-5z` |
+| 订阅 | 4 个圆角矩形 `7×7 rx=1.8`，左上角分别在 `(3.5,3.5)` `(13.5,3.5)` `(3.5,13.5)` `(13.5,13.5)` |
+| 我的 | 圆 `cx=12 cy=8 r=4` + `M4.5 20.5c1.5-3.6 4.4-5.5 7.5-5.5s6 1.9 7.5 5.5` |
+| 导入 | `M12 5v14M5 12h14`，描边 `2` |
+
+---
+
+## 2. 架构设计
+
+### 2.1 分层与本阶段各层职责
 
 ```text
-com.echopod
+presentation ──► domain ◄── data
+```
+
+导航栏本身几乎没有业务逻辑，所以**不要为"当前选中哪个 Tab"造 Repository / UseCase**——那是纯 UI 状态，交给 `NavController` 与 `SavedStateHandle` 即可。本阶段各层真正要做的事：
+
+| 层 | 本阶段内容 |
+|---|---|
+| `core/designsystem` | Quiet Paper 主题、图标、`EchoPodNavigationBar` / `EchoPodNavigationRail` 组件 |
+| `core/adaptive` | 窗口宽度 → `NavigationLayout` 的映射（纯函数，可 JVM 单测） |
+| `presentation` | 路由、`EchoPodAppState`（导航 UI 逻辑）、`MainShellViewModel` + `MainShellUiState`、外壳 Composable、占位页面 |
+| `domain` + `data` | 外壳里**唯一**需要业务数据的是迷你播放器 → 用它打通第一条完整链路：`PlaybackRepository` 接口 → 假数据实现 → UseCase → ViewModel（Step 8，可单独提交） |
+
+### 2.2 状态归属（避免"双数据源"）
+
+| 状态 | 归属 | 原因 |
+|---|---|---|
+| 当前一级页面 | `NavController` 返回栈（`EchoPodAppState` 派生） | 返回栈是唯一真相；在 ViewModel 里再存一份会出现不一致 |
+| 各 Tab 的滚动位置 / 页面状态 | `NavHost` 的 `saveState` / `restoreState` + `rememberSaveable` | 官方多返回栈机制，跨配置变更自动保存 |
+| 当前导航形态（Bar / Rail） | 每帧根据 `currentWindowAdaptiveInfo()` 计算 | 纯派生值，不需要保存 |
+| 导入弹窗是否显示 | `MainShellViewModel` + `SavedStateHandle` | 折叠/展开后弹窗不应消失 |
+| 迷你播放器数据 | `MainShellViewModel` ← `ObserveNowPlayingUseCase` | 业务数据，走 Clean Architecture |
+
+### 2.3 目标目录
+
+```text
+app/src/main/java/com/echopod/
+├── EchoPodApplication.kt                  # 持有 AppContainer（Step 8）
 ├── MainActivity.kt
 ├── di/
-│   └── AppContainer.kt                         # 轻量手动依赖注入容器（后续可平滑替换为 Hilt）
+│   └── AppContainer.kt                    # 手动 DI（Step 8）
 ├── core/
-│   ├── designsystem/
-│   │   ├── theme/
-│   │   │   ├── Color.kt                        # Quiet Paper 浅色 & 深色精确色值
-│   │   │   ├── Type.kt                         # 字体层级（28/22/18/16/15/12）
-│   │   │   ├── Shape.kt                        # 圆角规范（8/12/16/20-24/Full）
-│   │   │   └── Theme.kt                        # EchoPodTheme
-│   │   └── icon/
-│   │       └── EchoPodIcons.kt                 # 首页/发现/订阅/我的/导入 矢量图标（1.8dp 描边）
-│   └── adaptive/
-│       └── AdaptiveNavigationLayout.kt         # WindowWidthSizeClass -> BottomBar / Rail 映射
-├── domain/
-│   └── navigation/
-│       ├── model/
-│       │   └── AppDestination.kt               # 纯 Kotlin 枚举：HOME / DISCOVER / SUBSCRIPTIONS / PROFILE
-│       ├── repository/
-│       │   └── NavigationPreferencesRepository.kt
-│       └── usecase/
-│           ├── ObserveLastDestinationUseCase.kt
-│           └── SaveLastDestinationUseCase.kt
-├── data/
-│   └── navigation/
-│       └── InMemoryNavigationPreferencesRepository.kt  # 初始实现（后续可替换为 DataStore）
+│   ├── adaptive/
+│   │   └── NavigationLayout.kt            # 替换当前空的 AdaptiveNavigationLayout.kt
+│   └── designsystem/
+│       ├── theme/  Color.kt  Type.kt  Shape.kt  Theme.kt
+│       └── component/
+│           ├── EchoPodNavigationBar.kt
+│           └── EchoPodNavigationRail.kt
+├── domain/                                # Step 8，纯 Kotlin
+│   └── playback/
+│       ├── model/NowPlaying.kt
+│       ├── repository/PlaybackRepository.kt
+│       └── usecase/ObserveNowPlayingUseCase.kt  TogglePlaybackUseCase.kt
+├── data/                                  # Step 8
+│   └── playback/FakePlaybackRepository.kt
 └── presentation/
     ├── navigation/
-    │   ├── MainNavigationUiState.kt            # 不可变 UiState
-    │   ├── MainNavigationViewModel.kt          # MVVM ViewModel + StateFlow + SavedStateHandle
-    │   ├── EchoPodAppShell.kt                  # 自适应导航壳（Compact BottomBar / Medium+Expanded Rail）
-    │   └── EchoPodNavHost.kt                   # Compose Navigation NavHost（保留 Tab 状态）
+    │   ├── TopLevelDestination.kt         # 4 个一级页面：路由 + 文案 + 图标
+    │   ├── EchoPodNavHost.kt
+    │   └── EchoPodAppState.kt
+    ├── shell/
+    │   ├── MainShellUiState.kt
+    │   ├── MainShellViewModel.kt
+    │   ├── EchoPodAppShell.kt             # 无状态外壳：按 NavigationLayout 摆放
+    │   └── EchoPodApp.kt                  # 有状态入口：连接 ViewModel / AppState
     └── feature/
-        ├── home/HomePlaceholderScreen.kt
-        ├── discover/DiscoverPlaceholderScreen.kt
-        ├── subscriptions/SubscriptionsPlaceholderScreen.kt
-        └── profile/ProfilePlaceholderScreen.kt
+        ├── home/HomeScreen.kt
+        ├── discover/DiscoverScreen.kt
+        ├── subscriptions/SubscriptionsScreen.kt
+        └── profile/ProfileScreen.kt
+
+app/src/main/res/
+├── drawable/  ic_nav_home / ic_nav_discover / ic_nav_subscriptions / ic_nav_profile / ic_add .xml
+├── values/    strings.xml  themes.xml  colors.xml
+└── values-night/  themes.xml  colors.xml
 ```
 
 ---
 
-## Step 1：配置依赖（`gradle/libs.versions.toml` 与 `app/build.gradle.kts`）
+## Step 1：添加依赖
 
-1. 在 `gradle/libs.versions.toml` 中新增自适应布局、导航、Lifecycle ViewModel 及测试依赖：
-   - `androidx.compose.material3:material3-adaptive-navigation-suite`（或配合 `androidx.compose.material3.adaptive:adaptive`）
-   - `androidx.compose.material3.adaptive:adaptive`（提供 `currentWindowAdaptiveInfo()`）
-   - `androidx.window:window`（为后续 `FoldingFeature` 桌面/书本模式做准备）
-   - `androidx.navigation:navigation-compose`
-   - `androidx.lifecycle:lifecycle-viewmodel-compose`、`androidx.lifecycle:lifecycle-runtime-compose`
-   - 单元测试：`junit`、`org.jetbrains.kotlinx:kotlinx-coroutines-test`
-   - UI 测试：`androidx.compose.ui:ui-test-junit4`、`androidx.compose.ui:ui-test-manifest`、`androidx.compose.ui:ui-tooling`、`androidx.compose.ui:ui-tooling-preview`
-2. 在 `app/build.gradle.kts` 中引入以上依赖，并开启 `testOptions`（如需）。
-3. 执行 `./gradlew :app:assembleDebug` 确认依赖解析和基础构建通过。
+**文件：** `gradle/libs.versions.toml`、`app/build.gradle.kts`、根 `build.gradle.kts`
 
----
+```toml
+[versions]
+adaptive = "1.1.0"            # currentWindowAdaptiveInfo()
+navigation = "2.9.0"          # 类型安全路由
+lifecycle = "2.9.0"
+serialization = "1.8.1"
+coroutines = "1.10.2"
+junit = "4.13.2"
+androidx-junit = "1.2.1"
 
-## Step 2：实现 Quiet Paper 设计系统（`core/designsystem`）
+[libraries]
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
+compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }
+adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "adaptive" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+junit = { module = "junit:junit", version.ref = "junit" }
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-junit" }
 
-### 2.1 色彩规范（`Color.kt` & `Theme.kt`）
+[plugins]
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+```
 
-严格对照设计稿与 HTML 源码中的色值建立 `EchoPodLightColorScheme` 与 `EchoPodDarkColorScheme`：
-
-| 语义 | 浅色（Light） | 深色（Dark） | 导航栏用途 |
-|---|---|---|---|
-| Background | `#F7F5F0` | `#131412` | 页面暖白/深墨底色 |
-| Surface / Card | `#FFFFFF` | `#22231F` | 卡片与迷你播放器 |
-| SurfaceContainer | `#EFECE5` | `#2A2B27` | 底部导航栏 / 侧边 Rail 背景 |
-| OnBackground（主文字） | `#1C1B19` | `#ECEAE4` | 选中 Tab 文字 / Rail 导入 FAB 背景 |
-| OnSurfaceVariant（辅助文字） | `#6B675F` | `#A3A098` | 未选中图标与文字 |
-| Outline（描边） | `#E3DFD6` | `#33342F` | 分割线 / 卡片描边 |
-| Primary（品牌·雾青） | `#2E6B66` | `#86C6BD` | 进度条、播放按钮 |
-| SecondaryContainer（品牌容器） | `#D6E7E3` | `#1F3B38` | 导航选中胶囊背景 |
-| OnSecondaryContainer | `#123A37` | `#BFE3DD` | 导航选中图标颜色 |
-| Tertiary（更新圆点） | `#E4893F` | `#F0A060` | 仅用于更新提示圆点 |
-
-### 2.2 矢量图标（`EchoPodIcons.kt`）
-
-按设计稿 SVG 路径创建 24dp 线性图标（`strokeWidth = 1.8f / 1.9f`，圆角端点）：
-- `Home`（房屋轮廓）
-- `Discover`（指南针）
-- `Subscriptions`（2×2 圆角四宫格）
-- `Profile`（人物轮廓）
-- `Add`（`+` 号，用于侧边 Rail 顶部导入 FAB）
-
----
-
-## Step 3：搭建 Domain 层与 Data 层（Clean Architecture）
-
-1. **`domain/navigation/model/AppDestination.kt`**：
-   - 定义纯 Kotlin 枚举 `AppDestination { HOME, DISCOVER, SUBSCRIPTIONS, PROFILE }`（不持有 `@StringRes` 或 `ImageVector`，UI 资源映射留在 `presentation` 层）。
-2. **`domain/navigation/repository/NavigationPreferencesRepository.kt`**：
-   - 定义接口：`observeLastDestination(): Flow<AppDestination>` 与 `suspend fun saveLastDestination(destination: AppDestination)`。
-3. **`domain/navigation/usecase/`**：
-   - `ObserveLastDestinationUseCase`：对外暴露上次停留的一级页面流。
-   - `SaveLastDestinationUseCase`：记录当前切换的一级页面。
-4. **`data/navigation/InMemoryNavigationPreferencesRepository.kt`**：
-   - 使用 `MutableStateFlow(AppDestination.HOME)` 实现仓库接口；后续引入 Jetpack DataStore 时，只需替换该实现，无需改动 Domain 与 UI 层。
-5. **`di/AppContainer.kt`**：
-   - 组装 Repository、UseCase 与 `ViewModelProvider.Factory`。
-
----
-
-## Step 4：实现 MVVM 导航 ViewModel（`presentation/navigation`）
-
-1. **`MainNavigationUiState.kt`**：
-   ```kotlin
-   data class MainNavigationUiState(
-       val currentDestination: AppDestination = AppDestination.HOME,
-       val isImportDialogVisible: Boolean = false,
-   )
-   ```
-2. **`MainNavigationViewModel.kt`**：
-   - 构造注入 `ObserveLastDestinationUseCase`、`SaveLastDestinationUseCase` 与 `SavedStateHandle`。
-   - 暴露 `val uiState: StateFlow<MainNavigationUiState>`。
-   - 提供单向数据流事件方法：
-     - `onDestinationSelected(destination: AppDestination)`：更新 `SavedStateHandle` 并调用 `SaveLastDestinationUseCase`。
-     - `onImportClicked()` / `onDismissImport()`：控制侧边 Rail 顶部 `+` 按钮的导入弹窗入口状态。
-
----
-
-## Step 5：实现折叠屏自适应导航壳（`core/adaptive` + `EchoPodAppShell`）
-
-### 5.1 窗口宽度断点规则（严禁按设备型号判断）
-
-通过 `currentWindowAdaptiveInfo().windowSizeClass.windowWidthSizeClass` 决定导航形态：
+`app/build.gradle.kts`：
 
 ```kotlin
-enum class AdaptiveNavigationType {
-    BOTTOM_BAR,      // Compact: < 600dp
-    NAVIGATION_RAIL, // Medium: 600..839dp & Expanded: >= 840dp
+plugins {
+    // ...已有
+    alias(libs.plugins.kotlin.serialization)
+}
+
+android {
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+}
+
+dependencies {
+    implementation(platform(libs.compose.bom))
+    implementation(libs.activity.compose)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.adaptive)
+    implementation(libs.navigation.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.kotlinx.serialization.json)
+    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    androidTestImplementation(libs.androidx.junit)
 }
 ```
 
-> **注意设计稿细节**：即使在 `Expanded (>= 840dp)` 横向展开态，EchoPod 依然采用 **侧边 `NavigationRail`**（而非展开式 `NavigationDrawer`），以便将横向空间留给双栏 `ListDetailPaneScaffold`。
+根 `build.gradle.kts` 增加 `alias(libs.plugins.kotlin.serialization) apply false`。
 
-### 5.2 视觉与交互尺寸规格
+> 不需要单独引 `androidx.window:window`：`currentWindowAdaptiveInfo()` 已经通过 `windowPosture` 提供铰链与桌面模式信息。也**不用**引 `material-icons-extended`（体积大），图标已按 1.4 节做成 Vector Drawable（见 Step 3）。
+>
+> 版本号以 Gradle Sync 结果为准；以上版本均兼容当前 `compileSdk = 35` / AGP 8.13。
 
-- **Compact 底部导航栏（`BOTTOM_BAR`）**：
-  - 内容区高度：`80.dp`，叠加系统底部手势栏 `WindowInsets.navigationBars`。
-  - 背景色：`MaterialTheme.colorScheme.surfaceContainer`（`#EFECE5` / `#2A2B27`）。
-  - 4 等分网格布局，单项触控热区 `>= 48.dp`。
-  - 选中态胶囊：`64.dp × 32.dp`，圆角 `16.dp`，背景 `#D6E7E3`（深色 `#1F3B38`），图标 `#123A37`（深色 `#BFE3DD`），文字 `12.sp SemiBold`。
-  - 未选中态：图标与文字 `#6B675F`（深色 `#A3A098`），文字 `12.sp Medium`。
-  - 切换动效：`200ms` 选中态过渡。
-- **Medium / Expanded 侧边导航栏（`NAVIGATION_RAIL`）**：
-  - 宽度：`88.dp`，适配 `WindowInsets.safeDrawing`（左侧/顶部安全区）。
-  - 背景色同底部栏（`#EFECE5` / `#2A2B27`）。
-  - 顶部 `+` 导入播客 FAB：`56.dp × 56.dp`，圆角 `16.dp`，背景 `#1C1B19`（深色 `#ECEAE4`），图标 `#F7F5F0`（深色 `#131412`），底部间距 `20.dp`。
-  - 4 个导航项垂直居中排列，选中胶囊 `56.dp × 32.dp`，圆角 `16.dp`，间距 `12.dp`。
-
-### 5.3 Navigation 接入与状态保留（`EchoPodNavHost.kt`）
-
-- 使用 `rememberNavController()` 管理 4 个一级页面。
-- 切换 Tab 时遵循官方多返回栈配置，确保滚动位置与页面状态不丢失：
-  ```kotlin
-  navController.navigate(destination.route) {
-      popUpTo(navController.graph.findStartDestination().id) {
-          saveState = true
-      }
-      launchSingleTop = true
-      restoreState = true
-  }
-  ```
-- 检查 `AndroidManifest.xml`：确认应用支持多窗口与动态尺寸调整（API 24+ 默认 `resizeableActivity="true"`），不在 Manifest 锁死屏幕方向。
+**验证：** `./gradlew :app:assembleDebug`
+**提交：** `build: add adaptive, navigation, lifecycle and test dependencies`
 
 ---
 
-## Step 6：接入占位页面与 `MainActivity`
+## Step 2：Quiet Paper 主题（`core/designsystem/theme`）✅ 已完成
 
-1. 在 `presentation/feature/` 下分别创建 4 个轻量占位页（首页、发现、订阅、我的），每页放一个可滚动列表与当前窗口尺寸类别标识（如 `Compact / Medium / Expanded`），方便肉眼验证切换与折叠连续性。
-2. 更新 `MainActivity.kt`：
-   - 保持 `enableEdgeToEdge()`。
-   - 用 `EchoPodTheme` 包裹 `EchoPodAppShell`。
-   - 为侧边 Rail 顶部的 `+` 导入按钮挂载占位 Dialog/BottomSheet 回调。
+已实现文件：`Color.kt`、`Type.kt`、`Shape.kt`、`Theme.kt`，并在 `MainActivity` 中用 `EchoPodTheme` 替换了默认配色。
+
+### 2.1 色值 → Material 3 角色映射（`Color.kt`）
+
+把设计稿色值放进 M3 的**正确角色**，M3 的 `NavigationBar` / `NavigationRail` / `FloatingActionButton` / `ElevatedCard` 默认就能取到对的颜色：
+
+| M3 角色 | 浅色 | 深色 | 用在哪 |
+|---|---|---|---|
+| `background` / `surface` | `#F7F5F0` | `#131412` | 页面底色（`Surface()` 默认取 `surface`，所以两者相同） |
+| `surfaceContainerLow` / `surfaceBright` | `#FFFFFF` | `#22231F` | **卡片**、迷你播放器（`ElevatedCard` 默认取 `surfaceContainerLow`） |
+| `surfaceContainer`（及 High / Highest / `surfaceVariant`） | `#EFECE5` | `#2A2B27` | **导航栏 / Rail 背景**、搜索框、筛选标签 |
+| `onBackground` / `onSurface` | `#1C1B19` | `#ECEAE4` | 主文字、选中 Tab 文字 |
+| `onSurfaceVariant` | `#6B675F` | `#A3A098` | 辅助文字、未选中图标与文字 |
+| `outline` | `#E3DFD6` | `#3A3B36` | 进度轨道、圆形按钮描边 |
+| `outlineVariant` | `#E3DFD6` | `#33342F` | 分割线 |
+| `primary` / `onPrimary` | `#2E6B66` / `#FFFFFF` | `#86C6BD` / `#0F2A27` | 品牌色：进度条、播放按钮 |
+| `secondaryContainer`（同 `primaryContainer`） | `#D6E7E3` | `#1F3B38` | **导航选中指示器**、"已订阅"按钮 |
+| `onSecondaryContainer`（同 `onPrimaryContainer`） | `#123A37` | `#BFE3DD` | 选中图标 |
+| `inverseSurface` / `inverseOnSurface` | `#1C1B19` / `#F7F5F0` | `#ECEAE4` / `#131412` | **Rail 顶部导入 FAB**、首页"导入"按钮 |
+| `tertiary` | `#E4893F` | `#F0A060` | 更新提示圆点 |
+
+- `surfaceTint` 设为透明，避免 M3 给有 tonal elevation 的组件叠一层品牌色。
+- 注意：普通 `Card`（Filled）默认取 `surfaceContainerHighest`（=`#EFECE5`），白色卡片请用 `ElevatedCard` 或显式传 `surfaceContainerLow`。
+- 设计稿中的"正文辅助"色（`#4A4741` / `#C9C5BC`，节目简介段落）在 M3 中没有对应角色，暂以 `internal val InkSoftLight/Dark` 保留在 `Color.kt`，需要时再加 `CompositionLocal` 扩展色。
+
+### 2.2 字体层级（`Type.kt`）
+
+| M3 角色 | 设计用途 | 字号 / 字重 |
+|---|---|---|
+| `headlineMedium` | 页面标题 "EchoPod" | 28 / 700，字距 -0.6 |
+| `headlineSmall` | 播放器 / 节目详情标题 | 22 / 700 |
+| `titleLarge` | 区块标题"继续收听" | 18 / 600 |
+| `titleMedium` | 单集标题 | 16 / 600 |
+| `titleSmall` | 小标题、搜索框 | 14 / 600 |
+| `bodyLarge` | 正文 | 15 / 400，行高 24 |
+| `bodyMedium` / `bodySmall` | 辅助信息 | 13 / 400、12 / 400 |
+| `labelLarge` | 按钮 | 15 / 600 |
+| `labelMedium` | **导航标签**、筛选标签 | 12 / 500（选中时 `copy(fontWeight = SemiBold)`） |
+
+设计规范允许 Android 端回退到系统字体（Roboto + 思源黑体），因此不打包 Inter / Noto Sans SC 字体文件。
+
+### 2.3 圆角（`Shape.kt`）
+
+`extraSmall 8`（小封面）· `small 12`（封面）· `medium 16`（迷你播放器）· `large 20`（卡片）· `extraLarge 24`（大卡片、弹窗、Expanded 纸面）。按钮与导航指示器为全圆，不在 `Shapes` 内。
+
+### 2.4 窗口主题（`res/values[-night]/themes.xml`、`colors.xml`）
+
+`AndroidManifest` 改用 `@style/Theme.EchoPod`，仅设置 `windowBackground` 为 `#F7F5F0` / `#131412`。作用：冷启动以及折叠/展开导致 Activity 重建时，不会闪白屏或黑屏。
 
 ---
 
-## Step 7：测试与验收清单
+## Step 3：图标与文案资源 ✅ 已完成
 
-### 7.1 自动化测试
+图标以 **Vector Drawable** 形式放在 `res/drawable/`，路径与描边直接取自设计稿 SVG（24dp、1.8 描边、圆角端点）：
 
-1. **单元测试（`app/src/test/.../MainNavigationViewModelTest.kt`）**：
-   - 默认启动选中 `AppDestination.HOME`。
-   - 调用 `onDestinationSelected(AppDestination.SUBSCRIPTIONS)` 后，`uiState` 与 Repository 同步更新。
-   - `onImportClicked()` / `onDismissImport()` 状态流转正确。
-2. **Compose UI 测试（`app/src/androidTest/.../EchoPodAppShellTest.kt`）**：
-   - 模拟 `Compact` 宽度（如 `412.dp`）：断言显示底部导航栏，不显示侧边 Rail。
-   - 模拟 `Medium`（`704.dp`）与 `Expanded`（`840.dp`）：断言显示侧边 Rail 及 `+` 导入按钮，不显示底部导航栏。
-   - 点击 4 个导航项，断言选中态与内容区正确切换。
+| 资源 | 用途 |
+|---|---|
+| `ic_nav_home.xml` | 首页 |
+| `ic_nav_discover.xml` | 发现 |
+| `ic_nav_subscriptions.xml` | 订阅 |
+| `ic_nav_profile.xml` | 我的 |
+| `ic_add.xml` | Rail 顶部导入 FAB、首页"导入"按钮（2.0 描边） |
 
-### 7.2 命令行构建与验证
+使用方式：`Icon(painterResource(R.drawable.ic_nav_home), contentDescription = null, modifier = Modifier.size(22.dp))`。`Icon` 会用 `LocalContentColor` 着色，因此 XML 里的黑色描边只是占位。导航项的文字已经是无障碍标签，图标 `contentDescription` 传 `null`。
+
+`res/values/strings.xml` 已新增：`nav_home`、`nav_discover`、`nav_subscriptions`、`nav_profile`、`action_import`（首页按钮文字"导入"）、`action_import_podcast`（FAB 无障碍描述"导入播客"）。
+
+---
+
+## Step 4：窗口宽度 → 导航形态（`core/adaptive/NavigationLayout.kt`）
+
+把已暂存的空文件 `AdaptiveNavigationLayout.kt` 改名为 `NavigationLayout.kt`：
+
+```kotlin
+enum class NavigationLayout { BottomBar, MediumRail, ExpandedRail }
+
+/** 纯函数：只依赖 window-core 的 WindowSizeClass，可在 JVM 单测。 */
+fun navigationLayoutFor(sizeClass: WindowSizeClass): NavigationLayout = when {
+    sizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND) -> NavigationLayout.ExpandedRail
+    sizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) -> NavigationLayout.MediumRail
+    else -> NavigationLayout.BottomBar
+}
+
+@Composable
+fun rememberNavigationLayout(): NavigationLayout {
+    val sizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    return remember(sizeClass) { navigationLayoutFor(sizeClass) }
+}
+```
+
+要点：
+- **只看窗口宽度**，不看设备型号、不看横竖屏。横屏手机（宽 ≥ 600dp）也会切到 Rail，这是期望行为。
+- `MediumRail` 与 `ExpandedRail` 分开，是因为两者 Rail 宽度、间距、内容区样式都不同（见 1.2 / 1.3）。
+- 若 adaptive 版本较旧没有 `isWidthAtLeastBreakpoint`，改用 `windowWidthSizeClass == WindowWidthSizeClass.EXPANDED` 判断。
+
+**单测**（`app/src/test/.../core/adaptive/NavigationLayoutTest.kt`）：
+
+```kotlin
+@Test fun compact()  = assertEquals(BottomBar,    navigationLayoutFor(WindowSizeClass(minWidthDp = 0,   minHeightDp = 0)))
+@Test fun medium()   = assertEquals(MediumRail,   navigationLayoutFor(WindowSizeClass(minWidthDp = 600, minHeightDp = 0)))
+@Test fun expanded() = assertEquals(ExpandedRail, navigationLayoutFor(WindowSizeClass(minWidthDp = 840, minHeightDp = 0)))
+```
+
+**提交：** `feat(adaptive): map window width to navigation layout`
+
+---
+
+## Step 5：导航组件（`core/designsystem/component`）
+
+基于 M3 的 `NavigationBar` / `NavigationRail` 封装——它们自带 Tab 语义、选中动画、48dp 热区与 insets 处理，而且默认尺寸（80dp 高、64×32 指示器、80dp Rail、56×32 指示器）与设计稿基本一致。封装成自有组件的好处是：调用方不感知 M3 细节，将来要换成完全自绘也只改这一处。
+
+> 为什么不直接用 `NavigationSuiteScaffold`：它不支持"迷你播放器夹在内容和底栏之间"、Expanded 的"纸面"内容区，Rail 顶部 FAB 的支持也取决于版本。自己用 `NavigationBar` + `NavigationRail` 组合更可控。
+
+组件只接收**纯 UI 数据**，不认识路由：
+
+```kotlin
+@Immutable
+data class NavItem(val label: String, @DrawableRes val iconRes: Int)
+```
+
+### 5.1 `EchoPodNavigationBar`
+
+```kotlin
+@Composable
+fun EchoPodNavigationBar(
+    items: List<NavItem>,
+    selectedIndex: Int,
+    onItemClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    NavigationBar(
+        modifier = modifier,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        tonalElevation = 0.dp,
+    ) {
+        items.forEachIndexed { index, item ->
+            val selected = index == selectedIndex
+            NavigationBarItem(
+                selected = selected,
+                onClick = { onItemClick(index) },
+                icon = { Icon(painterResource(item.iconRes), null, Modifier.size(22.dp)) },
+                label = {
+                    Text(
+                        item.label,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
+                        ),
+                    )
+                },
+                colors = echoPodNavItemColors(),
+            )
+        }
+    }
+}
+```
+
+`echoPodNavItemColors()`：选中图标 `onSecondaryContainer`、选中文字 `onSurface`、指示器 `secondaryContainer`、未选中图标/文字 `onSurfaceVariant`。`NavigationBar` 默认 `windowInsets` 已包含底部手势条，**不要**再在外面加 `navigationBarsPadding()`。
+
+### 5.2 `EchoPodNavigationRail`
+
+```kotlin
+enum class RailStyle(val width: Dp, val topPadding: Dp, val fabBottomSpacing: Dp, val itemSpacing: Dp, val transparent: Boolean) {
+    Medium(88.dp, 28.dp, 20.dp, 12.dp, transparent = false),
+    Expanded(80.dp, 20.dp, 16.dp, 8.dp, transparent = true),
+}
+
+@Composable
+fun EchoPodNavigationRail(
+    items: List<NavItem>,
+    selectedIndex: Int,
+    onItemClick: (Int) -> Unit,
+    onImportClick: () -> Unit,
+    importContentDescription: String,
+    style: RailStyle,
+    modifier: Modifier = Modifier,
+) {
+    NavigationRail(
+        modifier = modifier.width(style.width),
+        containerColor = if (style.transparent) Color.Transparent else MaterialTheme.colorScheme.surfaceContainer,
+        header = {
+            FloatingActionButton(
+                onClick = onImportClick,
+                shape = RoundedCornerShape(16.dp),
+                containerColor = MaterialTheme.colorScheme.inverseSurface,
+                contentColor = MaterialTheme.colorScheme.inverseOnSurface,
+                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+                modifier = Modifier.padding(top = style.topPadding, bottom = style.fabBottomSpacing),
+            ) { Icon(painterResource(R.drawable.ic_add), contentDescription = importContentDescription) }
+        },
+    ) {
+        items.forEachIndexed { index, item ->
+            NavigationRailItem(
+                selected = index == selectedIndex,
+                onClick = { onItemClick(index) },
+                icon = { Icon(painterResource(item.iconRes), null, Modifier.size(22.dp)) },
+                label = { /* 同 5.1 */ },
+                colors = echoPodRailItemColors(),
+                modifier = Modifier.padding(vertical = style.itemSpacing / 2).height(60.dp),
+            )
+        }
+    }
+}
+```
+
+注意：
+- Rail 默认 `windowInsets` 只含系统栏；横屏时摄像头挖孔可能在左侧，需要 `windowInsets = NavigationRailDefaults.windowInsets.union(WindowInsets.displayCutout.only(WindowInsetsSides.Start))`。
+- **矮窗口**（横屏手机，高度 < 480dp）时 FAB + 4 项约 380dp 高，加上 insets 可能放不下：此时把 Rail 内容包进 `verticalScroll`，或用 `RailStyle.Expanded` 的紧凑间距。
+- 如果 M3 内部间距与设计稿有几 dp 偏差且无法接受，再在这个文件里改为自绘（`Column` + `Modifier.selectable(role = Role.Tab)`），对外 API 不变。
+
+**验证：** 为两个组件各写浅/深色 `@Preview`，与 PNG 并排比对。
+**提交：** `feat(designsystem): add EchoPodNavigationBar and EchoPodNavigationRail`
+
+---
+
+## Step 6：路由与导航状态（`presentation/navigation`）
+
+### 6.1 `TopLevelDestination.kt`
+
+```kotlin
+@Serializable data object HomeRoute
+@Serializable data object DiscoverRoute
+@Serializable data object SubscriptionsRoute
+@Serializable data object ProfileRoute
+
+enum class TopLevelDestination(
+    val route: Any,
+    @StringRes val labelRes: Int,
+    @DrawableRes val iconRes: Int,
+) {
+    HOME(HomeRoute, R.string.nav_home, R.drawable.ic_nav_home),
+    DISCOVER(DiscoverRoute, R.string.nav_discover, R.drawable.ic_nav_discover),
+    SUBSCRIPTIONS(SubscriptionsRoute, R.string.nav_subscriptions, R.drawable.ic_nav_subscriptions),
+    PROFILE(ProfileRoute, R.string.nav_profile, R.drawable.ic_nav_profile),
+}
+```
+
+> 它引用了 Android 资源 ID（`@StringRes` / `@DrawableRes`），属于 presentation，**不要**放进 `domain`。
+
+所需文案已在 Step 3 加入 `strings.xml`。
+
+### 6.2 `EchoPodAppState.kt`（导航 UI 逻辑的状态持有者）
+
+```kotlin
+@Stable
+class EchoPodAppState(
+    val navController: NavHostController,
+    val navigationLayout: NavigationLayout,
+) {
+    val currentTopLevelDestination: TopLevelDestination?
+        @Composable get() {
+            val entry by navController.currentBackStackEntryAsState()
+            val dest = entry?.destination ?: return null
+            return TopLevelDestination.entries.firstOrNull { d ->
+                dest.hierarchy.any { it.hasRoute(d.route::class) }
+            }
+        }
+
+    fun navigateToTopLevel(destination: TopLevelDestination) {
+        navController.navigate(destination.route) {
+            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
+}
+
+@Composable
+fun rememberEchoPodAppState(
+    navController: NavHostController = rememberNavController(),
+    navigationLayout: NavigationLayout = rememberNavigationLayout(),
+) = remember(navController, navigationLayout) { EchoPodAppState(navController, navigationLayout) }
+```
+
+- `saveState` / `restoreState` 是"切 Tab 不丢滚动位置"的关键。
+- 用 `hierarchy` 判断，是为了以后进入"节目详情"等二级页面时，所属 Tab 仍保持选中。
+- 再次点击当前 Tab：先保持默认行为（无操作），"滚回顶部"后续再做。
+
+### 6.3 `EchoPodNavHost.kt`
+
+```kotlin
+@Composable
+fun EchoPodNavHost(appState: EchoPodAppState, modifier: Modifier = Modifier) {
+    NavHost(appState.navController, startDestination = HomeRoute, modifier = modifier) {
+        composable<HomeRoute> { HomeScreen() }
+        composable<DiscoverRoute> { DiscoverScreen() }
+        composable<SubscriptionsRoute> { SubscriptionsScreen() }
+        composable<ProfileRoute> { ProfileScreen() }
+    }
+}
+```
+
+页面切换动画：一级 Tab 之间用 `fadeIn/fadeOut(tween(200))`，符合"按钮/选中 200ms"的动效规范。
+
+**单测：** 此步主要是 UI 胶水，放到 Step 10 用 Compose UI 测试覆盖。
+**提交：** `feat(navigation): add top-level routes, NavHost and app state`
+
+---
+
+## Step 7：外壳 ViewModel（`presentation/shell`）
+
+先只管导入弹窗；迷你播放器字段在 Step 8 加入。
+
+```kotlin
+@Immutable
+data class MainShellUiState(
+    val isImportSheetVisible: Boolean = false,
+    // Step 8: val nowPlaying: NowPlaying? = null,
+)
+
+class MainShellViewModel(
+    private val savedStateHandle: SavedStateHandle,
+) : ViewModel() {
+
+    val uiState: StateFlow<MainShellUiState> =
+        savedStateHandle.getStateFlow(KEY_IMPORT_VISIBLE, false)
+            .map { MainShellUiState(isImportSheetVisible = it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), MainShellUiState())
+
+    fun onEvent(event: MainShellEvent) {
+        when (event) {
+            MainShellEvent.ImportClicked -> savedStateHandle[KEY_IMPORT_VISIBLE] = true
+            MainShellEvent.ImportDismissed -> savedStateHandle[KEY_IMPORT_VISIBLE] = false
+        }
+    }
+
+    private companion object { const val KEY_IMPORT_VISIBLE = "import_visible" }
+}
+
+sealed interface MainShellEvent {
+    data object ImportClicked : MainShellEvent
+    data object ImportDismissed : MainShellEvent
+}
+```
+
+- 用 `SavedStateHandle` 保存：折叠/展开导致 Activity 重建、甚至进程被回收后，弹窗状态都还在。
+- 只有 `SavedStateHandle` 一个构造参数时，默认的 `viewModel()` 工厂即可创建，无需手动 Factory。
+- 导入入口有两处：Compact 在首页标题栏（"+ 导入"按钮，由首页通过回调上抛），Medium/Expanded 在 Rail 顶部 FAB。**两处都发同一个 `ImportClicked` 事件**。
+
+**单测**（`MainShellViewModelTest`）：初始不可见；`ImportClicked` 后可见；`ImportDismissed` 后不可见；用预置 `SavedStateHandle(mapOf("import_visible" to true))` 构造时恢复为可见。
+
+**提交：** `feat(shell): add MainShellViewModel with saved import state`
+
+---
+
+## Step 8：迷你播放器的 Clean Architecture 链路（可单独提交，也可推后）
+
+外壳里唯一的业务数据是"正在播放"。用它打通 domain → data → presentation 的完整链路，以后接 Media3 时只替换 data 层。如果只想先交付导航栏，跳过本步，外壳的 `miniPlayer` 槽位传空即可。
+
+**domain（纯 Kotlin，不得 import android/androidx）：**
+
+```kotlin
+data class NowPlaying(
+    val episodeTitle: String,
+    val podcastTitle: String,
+    val speed: Float,
+    val progress: Float,          // 0f..1f
+    val remainingMinutes: Int,
+    val isPlaying: Boolean,
+)
+
+interface PlaybackRepository {
+    val nowPlaying: Flow<NowPlaying?>
+    suspend fun togglePlayPause()
+    suspend fun seekBy(seconds: Int)
+}
+
+class ObserveNowPlayingUseCase(private val repo: PlaybackRepository) {
+    operator fun invoke(): Flow<NowPlaying?> = repo.nowPlaying
+}
+class TogglePlaybackUseCase(private val repo: PlaybackRepository) {
+    suspend operator fun invoke() = repo.togglePlayPause()
+}
+```
+
+**data：** `FakePlaybackRepository` 用 `MutableStateFlow` 持有设计稿中的示例（《在深夜写代码的人，都在想些什么》· 夜航电台 · 1.2x · 剩余 23 分钟）。
+
+**di：** `AppContainer` 创建 Repository 与 UseCase；`EchoPodApplication` 持有它（记得在 Manifest 写 `android:name=".EchoPodApplication"`）。此时 `MainShellViewModel` 多了构造参数，用 `viewModelFactory { initializer { MainShellViewModel(createSavedStateHandle(), container.observeNowPlaying, container.togglePlayback) } }` 创建。
+
+**presentation：** `MainShellUiState` 增加 `nowPlaying: NowPlaying?`，用 `combine(savedStateHandle.getStateFlow(...), observeNowPlaying())` 生成；事件增加 `TogglePlayback`、`SeekBack`、`SeekForward`。`MiniPlayer` Composable 放在 `presentation/shell`，只接收数据与回调，`showSkipButtons` 参数控制 Medium 下的快退/快进按钮。
+
+**单测：** UseCase 各一个（用 Fake 仓库）；ViewModel 用 `runTest` + `UnconfinedTestDispatcher`（`Dispatchers.setMain`）断言 `nowPlaying` 能透传、`TogglePlayback` 会调用到仓库。
+
+**提交：** `feat(playback): add now-playing domain, fake repository and shell wiring`
+
+---
+
+## Step 9：自适应外壳（`presentation/shell/EchoPodAppShell.kt` + `EchoPodApp.kt`）
+
+### 9.1 无状态外壳
+
+外壳**不读取窗口尺寸、不持有 ViewModel**，只根据传入的 `navigationLayout` 摆放——这样 UI 测试可以直接指定任意形态。
+
+```kotlin
+@Composable
+fun EchoPodAppShell(
+    navigationLayout: NavigationLayout,
+    items: List<NavItem>,
+    selectedIndex: Int,
+    onItemClick: (Int) -> Unit,
+    onImportClick: () -> Unit,
+    miniPlayer: @Composable (NavigationLayout) -> Unit,
+    content: @Composable () -> Unit,
+) {
+    val windowBg = when (navigationLayout) {
+        NavigationLayout.ExpandedRail -> MaterialTheme.colorScheme.surfaceContainer
+        else -> MaterialTheme.colorScheme.background
+    }
+    Row(Modifier.fillMaxSize().background(windowBg)) {
+        if (navigationLayout != NavigationLayout.BottomBar) {
+            EchoPodNavigationRail(
+                items, selectedIndex, onItemClick, onImportClick,
+                importContentDescription = stringResource(R.string.action_import_podcast),
+                style = if (navigationLayout == NavigationLayout.MediumRail) RailStyle.Medium else RailStyle.Expanded,
+            )
+        }
+        Column(Modifier.weight(1f)) {
+            Box(Modifier.weight(1f).then(contentSurfaceModifier(navigationLayout))) {
+                content()                         // ← NavHost 始终在同一个调用位置
+                miniPlayer(navigationLayout)      // Compact/Medium 下悬浮在内容底部
+            }
+            if (navigationLayout == NavigationLayout.BottomBar) {
+                EchoPodNavigationBar(items, selectedIndex, onItemClick)
+            }
+        }
+    }
+}
+```
+
+- `contentSurfaceModifier`：Expanded 时为 `padding(top = 8.dp, end = 8.dp, bottom = 8.dp).clip(RoundedCornerShape(24.dp)).background(background)`（纸面效果），其余形态为 `Modifier`。
+- **`content()` 必须处于固定的调用位置**：Bar/Rail 用 `if` 包裹并放在它前后，Compose 会给 `if` 块单独分组，`content()` 的身份不变；所以拖动分屏窗口、从 Medium 变成 Compact 时 `NavHost` 不会被销毁重建。千万不要写成 `when(layout) { BottomBar -> Scaffold { content() }; else -> Row { content() } }`——那样三个分支里的 `content()` 是三个不同实例，切换形态会丢页面状态。
+- **Insets**：Compact 下底部 inset 由 `NavigationBar` 消费；Rail 形态下底部手势条需要内容区自己处理——各页面列表用 `contentPadding` 加上 `WindowInsets.navigationBars` 底部值，不要整体 `safeDrawingPadding()`（会让背景色无法延伸到状态栏后面）。页面顶部同理，用 `WindowInsets.statusBars`。
+- **迷你播放器位置**：Compact 时 `Modifier.align(BottomCenter).padding(horizontal = 8.dp, vertical = 8.dp)`，因为它在内容 `Box` 内、导航栏之上，自然满足"距导航栏 8dp"；Medium 时 `padding(horizontal = 24.dp, vertical = 16.dp)` 并额外加底部系统 inset；Expanded 时外壳**不渲染**（由首页的详情栏负责，Step 9 之后的任务）。页面列表需要在底部留出迷你播放器高度的 `contentPadding`，避免最后一项被挡住。
+
+### 9.2 有状态入口 `EchoPodApp.kt`
+
+```kotlin
+@Composable
+fun EchoPodApp(
+    appState: EchoPodAppState = rememberEchoPodAppState(),
+    viewModel: MainShellViewModel = viewModel(/* Step 8 后传 factory */),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val destinations = TopLevelDestination.entries
+    val items = destinations.map { NavItem(stringResource(it.labelRes), it.iconRes) }
+    val selected = appState.currentTopLevelDestination
+
+    EchoPodAppShell(
+        navigationLayout = appState.navigationLayout,
+        items = items,
+        selectedIndex = destinations.indexOf(selected),
+        onItemClick = { appState.navigateToTopLevel(destinations[it]) },
+        onImportClick = { viewModel.onEvent(MainShellEvent.ImportClicked) },
+        miniPlayer = { layout -> /* uiState.nowPlaying?.let { MiniPlayer(...) } */ },
+    ) {
+        EchoPodNavHost(appState)
+    }
+
+    if (uiState.isImportSheetVisible) {
+        ImportPlaceholderDialog(onDismiss = { viewModel.onEvent(MainShellEvent.ImportDismissed) })
+    }
+}
+```
+
+`MainActivity` 中：`setContent { EchoPodTheme { EchoPodApp() } }`。
+
+**AndroidManifest 检查：** 不要设置 `screenOrientation`；不要为了"避免重建"给 Activity 加 `configChanges`——状态保留应依赖 `SavedStateHandle` 与 `rememberSaveable`，而不是阻止重建。
+
+**提交：** `feat(shell): add adaptive app shell with bar/rail switching`
+
+---
+
+## Step 10：占位页面
+
+`presentation/feature/*/XxxScreen.kt` 各放一个占位页，内容刻意设计成方便验收：
+
+- 顶部大标题（首页 / 发现 / 订阅 / 我的），左右边距 Compact `16dp`、Medium `24dp`。
+- 一个 50 项的 `LazyColumn`（`rememberLazyListState()`），用来验证"切换 Tab / 折叠展开后滚动位置不丢"。
+- 首页标题栏在 **Compact** 下显示"+ 导入"按钮（高 `48dp`、圆角 `24dp`、`inverseSurface` 背景），通过 `onImportClick` 回调上抛；Medium/Expanded 下隐藏（Rail 已经有 FAB）。首页通过参数 `showImportButton: Boolean` 得知，不要在页面里自己读窗口尺寸。
+
+**提交：** `feat(feature): add placeholder top-level screens`
+
+---
+
+## Step 11：测试与验收
+
+### 11.1 JVM 单元测试（`./gradlew :app:testDebugUnitTest`）
+
+| 测试类 | 覆盖内容 |
+|---|---|
+| `NavigationLayoutTest` | 0 / 599 / 600 / 839 / 840 / 1200dp 边界映射 |
+| `MainShellViewModelTest` | 导入弹窗事件、`SavedStateHandle` 恢复、（Step 8 后）nowPlaying 透传与播放切换 |
+| `ObserveNowPlayingUseCaseTest` / `TogglePlaybackUseCaseTest` | Step 8 的 UseCase |
+
+### 11.2 Compose UI 测试（`./gradlew :app:connectedDebugAndroidTest`，需要设备）
+
+`EchoPodAppShellTest` 直接给无状态外壳传入不同的 `NavigationLayout`，不依赖真实设备宽度：
+
+- `BottomBar`：能找到 4 个导航项；找不到"导入播客"FAB。
+- `MediumRail` / `ExpandedRail`：能找到 FAB 和 4 个导航项。
+- 点击"订阅"→ 回调收到索引 2，且该项 `assertIsSelected()`。
+- 所有导航项与 FAB：`assertHeightIsAtLeast(48.dp)` 与 `assertWidthIsAtLeast(48.dp)`。
+
+另写一个 `EchoPodAppTest`（带真实 NavHost）：切到"订阅"→ 滚动列表 → 切到"首页"→ 切回"订阅"，断言列表仍在滚动后的位置；再用 `StateRestorationTester` 模拟重建，断言选中 Tab 与滚动位置仍在。
+
+### 11.3 人工验收清单
+
+推荐使用 Android Studio 的 **Resizable (Experimental)** 模拟器或 **Pixel Fold** 模拟器，可以即时切换手机 / 折叠 / 展开 / 平板。
+
+- [ ] **Compact**：底部 80dp 导航栏，4 项等分；选中胶囊 64×32 浅雾青色；与 [01-首页.png](../EchoPod-设计稿/PNG/01-手机/01-首页.png) 对比。
+- [ ] **Medium（展开竖持）**：左侧 88dp Rail、深色圆角 `+` FAB；与 [02-首页-竖向.png](../EchoPod-设计稿/PNG/02-折叠屏/02-首页-竖向.png) 对比。
+- [ ] **Expanded（展开横持）**：80dp 透明 Rail + 圆角纸面内容区，**没有**变成抽屉；与 [03-首页-横向.png](../EchoPod-设计稿/PNG/02-折叠屏/03-首页-横向.png) 对比。
+- [ ] **深色模式**：与 [14-首页-深色.png](../EchoPod-设计稿/PNG/01-手机/14-首页-深色.png)、[24-首页-深色-竖向.png](../EchoPod-设计稿/PNG/02-折叠屏/24-首页-深色-竖向.png) 对比，不出现 M3 默认紫色。
+- [ ] **连续性**：在"订阅"滚到第 30 项 → 折叠 / 展开 / 旋转 / 拖动分屏窗口宽度 → 仍在"订阅"且停在第 30 项附近。
+- [ ] **导入弹窗**：打开后折叠 / 展开，弹窗仍在。
+- [ ] **Edge-to-edge**：状态栏、手势条后面是页面底色；内容和导航不被遮挡；横屏挖孔不挡 Rail。
+- [ ] **横屏手机**（宽 ≥ 600、高 < 480）：Rail 内容放得下或可以滚动。
+- [ ] **TalkBack**：导航项朗读为"首页，标签，已选中"；FAB 朗读为"导入播客"。
+
+---
+
+## 提交顺序一览
+
+| # | 提交 | 可验证点 |
+|---|---|---|
+| 1 | `build: add adaptive, navigation, lifecycle and test dependencies` | 构建通过 |
+| 2 | `feat(designsystem): implement Quiet Paper color, type and shape tokens` | 已完成 |
+| 3 | `feat(res): add navigation icons and strings` | 已完成 |
+| 4 | `feat(adaptive): map window width to navigation layout` | 单测 |
+| 5 | `feat(designsystem): add EchoPodNavigationBar and EchoPodNavigationRail` | Preview |
+| 6 | `feat(navigation): add top-level routes, NavHost and app state` | 构建通过 |
+| 7 | `feat(shell): add MainShellViewModel with saved import state` | 单测 |
+| 8 | `feat(playback): add now-playing domain, fake repository and shell wiring` | 单测（可推后） |
+| 9 | `feat(shell): add adaptive app shell with bar/rail switching` | 真机/模拟器三种宽度 |
+| 10 | `feat(feature): add placeholder top-level screens` | 连续性验收 |
+| 11 | `test: add shell UI tests` | `connectedDebugAndroidTest` |
+
+每次提交前执行：
 
 ```sh
 ./gradlew :app:assembleDebug
 ./gradlew :app:testDebugUnitTest
-./gradlew :app:connectedDebugAndroidTest
 ```
 
-### 7.3 人工视觉与折叠屏验收
+---
 
-- [ ] **Compact（手机竖屏）**：底部导航栏 4 项居中、胶囊色值与高度（`80dp`）匹配 [01-首页.png](../EchoPod-设计稿/PNG/01-手机/01-首页.png)。
-- [ ] **Medium（折叠屏展开竖向 ~704×840）**：自动切换为左侧 `88dp` Rail，顶部显示黑色圆角 `+` 按钮，匹配 [02-首页-竖向.png](../EchoPod-设计稿/PNG/02-折叠屏/02-首页-竖向.png)。
-- [ ] **Expanded（折叠屏展开横向 ~840×704）**：保持左侧 `88dp` Rail（不展开为 Drawer），匹配 [03-首页-横向.png](../EchoPod-设计稿/PNG/02-折叠屏/03-首页-横向.png)。
-- [ ] **浅色 / 深色模式切换**：所有背景、胶囊、图标、文字颜色与 Quiet Paper 规范一致。
-- [ ] **展开/折叠连续性**：切换到「订阅」Tab 并向下滚动后，执行折叠/展开或旋转屏幕，Tab 仍停留在「订阅」且滚动位置保留。
-- [ ] **触控热区与安全区**：所有导航项与 FAB 触控热区 `>= 48dp`，底部手势条与状态栏无遮挡。
+## 下一阶段（本文档之外）
+
+1. **首页内容**：按断点切换订阅 4/5 列、最新更新 1/2 列；Compact 搜索图标 → Medium 常驻搜索框。
+2. **Expanded 双栏**：首页 / 订阅用 `ListDetailPaneScaffold`（`androidx.compose.material3.adaptive:adaptive-layout`），迷你播放器停靠在详情栏底部。
+3. **折叠姿态**：读取 `currentWindowAdaptiveInfo().windowPosture`——书本模式让双栏分界线对齐铰链（`hingeList`）；桌面模式（`isTabletop`）用于播放器上下分屏，控件不跨铰链。
+4. **真实播放**：用 Media3 `MediaSessionService` 实现 `PlaybackRepository`，替换 `FakePlaybackRepository`，domain 与 UI 不用改。

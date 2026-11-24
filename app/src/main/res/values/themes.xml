@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Window theme. Compose draws all UI; this only sets the window background so
+        that launch and Activity recreation (fold / unfold / rotate) show Quiet Paper
+        instead of a white or black flash.
+    -->
+    <style name="Theme.EchoPod" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/echopod_background</item>
+    </style>
+</resources>

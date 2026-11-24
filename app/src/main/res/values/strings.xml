@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">EchoPod</string>
     <string name="hello_world">Hello World</string>
+
+    <!-- 一级导航 -->
+    <string name="nav_home">首页</string>
+    <string name="nav_discover">发现</string>
+    <string name="nav_subscriptions">订阅</string>
+    <string name="nav_profile">我的</string>
+
+    <!-- 导入入口：Compact 为首页标题栏按钮文字，Medium/Expanded 为 Rail FAB 的无障碍描述 -->
+    <string name="action_import">导入</string>
+    <string name="action_import_podcast">导入播客</string>
 </resources>

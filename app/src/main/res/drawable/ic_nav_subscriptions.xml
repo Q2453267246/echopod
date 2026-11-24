@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 订阅：2×2 圆角四宫格（7×7，圆角 1.8），24dp 线性，1.8 描边（Quiet Paper） -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:pathData="M5.3,3.5h3.4a1.8,1.8 0,0 1,1.8 1.8v3.4a1.8,1.8 0,0 1,-1.8 1.8h-3.4a1.8,1.8 0,0 1,-1.8 -1.8v-3.4a1.8,1.8 0,0 1,1.8 -1.8z"
+        android:strokeWidth="1.8"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M15.3,3.5h3.4a1.8,1.8 0,0 1,1.8 1.8v3.4a1.8,1.8 0,0 1,-1.8 1.8h-3.4a1.8,1.8 0,0 1,-1.8 -1.8v-3.4a1.8,1.8 0,0 1,1.8 -1.8z"
+        android:strokeWidth="1.8"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M5.3,13.5h3.4a1.8,1.8 0,0 1,1.8 1.8v3.4a1.8,1.8 0,0 1,-1.8 1.8h-3.4a1.8,1.8 0,0 1,-1.8 -1.8v-3.4a1.8,1.8 0,0 1,1.8 -1.8z"
+        android:strokeWidth="1.8"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M15.3,13.5h3.4a1.8,1.8 0,0 1,1.8 1.8v3.4a1.8,1.8 0,0 1,-1.8 1.8h-3.4a1.8,1.8 0,0 1,-1.8 -1.8v-3.4a1.8,1.8 0,0 1,1.8 -1.8z"
+        android:strokeWidth="1.8"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
