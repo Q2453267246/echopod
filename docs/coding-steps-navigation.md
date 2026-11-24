@@ -153,7 +153,7 @@ app/src/main/res/
 
 ---
 
-## Step 1：添加依赖
+## Step 1：添加依赖 ✅ 已完成
 
 **文件：** `gradle/libs.versions.toml`、`app/build.gradle.kts`、根 `build.gradle.kts`
 
