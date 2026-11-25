@@ -236,28 +236,29 @@ dependencies {
 
 已实现文件：`Color.kt`、`Type.kt`、`Shape.kt`、`Theme.kt`，并在 `MainActivity` 中用 `EchoPodTheme` 替换了默认配色。
 
-### 2.1 色值 → Material 3 角色映射（`Color.kt`）
+### 2.1 颜色令牌（`Color.kt` + `Theme.kt`）
 
-把设计稿色值放进 M3 的**正确角色**，M3 的 `NavigationBar` / `NavigationRail` / `FloatingActionButton` / `ElevatedCard` 默认就能取到对的颜色：
+> **规则：UI 代码中的颜色一律使用 `EchoPodTheme.colors.xxx`，禁止使用 `MaterialTheme.colorScheme.xxx`。** 使用 M3 组件时，颜色参数也要显式传入项目令牌，不依赖 M3 默认取色。
 
-| M3 角色 | 浅色 | 深色 | 用在哪 |
+`Color.kt` 定义 `EchoPodColors`（按设计稿语义命名），`Theme.kt` 通过 `CompositionLocal` 提供，访问方式为 `EchoPodTheme.colors.brand`：
+
+| 令牌 | 浅色 | 深色 | 用在哪 |
 |---|---|---|---|
-| `background` / `surface` | `#F7F5F0` | `#131412` | 页面底色（`Surface()` 默认取 `surface`，所以两者相同） |
-| `surfaceContainerLow` / `surfaceBright` | `#FFFFFF` | `#22231F` | **卡片**、迷你播放器（`ElevatedCard` 默认取 `surfaceContainerLow`） |
-| `surfaceContainer`（及 High / Highest / `surfaceVariant`） | `#EFECE5` | `#2A2B27` | **导航栏 / Rail 背景**、搜索框、筛选标签 |
-| `onBackground` / `onSurface` | `#1C1B19` | `#ECEAE4` | 主文字、选中 Tab 文字 |
-| `onSurfaceVariant` | `#6B675F` | `#A3A098` | 辅助文字、未选中图标与文字 |
+| `background` | `#F7F5F0` | `#131412` | 页面底色 |
+| `card` | `#FFFFFF` | `#22231F` | 卡片、迷你播放器 |
+| `container` | `#EFECE5` | `#2A2B27` | **底部导航栏 / Rail 背景**、搜索框、筛选标签、Expanded 整窗底色 |
+| `textPrimary` | `#1C1B19` | `#ECEAE4` | 主文字、选中导航标签 |
+| `textBody` | `#4A4741` | `#C9C5BC` | 正文辅助（节目简介段落） |
+| `textSecondary` | `#6B675F` | `#A3A098` | 辅助文字、未选中导航图标与标签 |
 | `outline` | `#E3DFD6` | `#3A3B36` | 进度轨道、圆形按钮描边 |
-| `outlineVariant` | `#E3DFD6` | `#33342F` | 分割线 |
-| `primary` / `onPrimary` | `#2E6B66` / `#FFFFFF` | `#86C6BD` / `#0F2A27` | 品牌色：进度条、播放按钮 |
-| `secondaryContainer`（同 `primaryContainer`） | `#D6E7E3` | `#1F3B38` | **导航选中指示器**、"已订阅"按钮 |
-| `onSecondaryContainer`（同 `onPrimaryContainer`） | `#123A37` | `#BFE3DD` | 选中图标 |
-| `inverseSurface` / `inverseOnSurface` | `#1C1B19` / `#F7F5F0` | `#ECEAE4` / `#131412` | **Rail 顶部导入 FAB**、首页"导入"按钮 |
-| `tertiary` | `#E4893F` | `#F0A060` | 更新提示圆点 |
+| `divider` | `#E3DFD6` | `#33342F` | 分割线 |
+| `brand` / `onBrand` | `#2E6B66` / `#FFFFFF` | `#86C6BD` / `#0F2A27` | 进度条、播放按钮 |
+| `brandContainer` | `#D6E7E3` | `#1F3B38` | **导航选中指示器**、"已订阅"按钮 |
+| `onBrandContainer` | `#123A37` | `#BFE3DD` | **导航选中图标** |
+| `inkButton` / `onInkButton` | `#1C1B19` / `#F7F5F0` | `#ECEAE4` / `#131412` | **Rail 顶部导入 FAB**、首页"导入"按钮 |
+| `updateDot` | `#E4893F` | `#F0A060` | 更新提示圆点 |
 
-- `surfaceTint` 设为透明，避免 M3 给有 tonal elevation 的组件叠一层品牌色。
-- 注意：普通 `Card`（Filled）默认取 `surfaceContainerHighest`（=`#EFECE5`），白色卡片请用 `ElevatedCard` 或显式传 `surfaceContainerLow`。
-- 设计稿中的"正文辅助"色（`#4A4741` / `#C9C5BC`，节目简介段落）在 M3 中没有对应角色，暂以 `internal val InkSoftLight/Dark` 保留在 `Color.kt`，需要时再加 `CompositionLocal` 扩展色。
+`MaterialTheme` 仍会收到一份由这些令牌**派生**的 `ColorScheme`（`toMaterialColorScheme()`，`internal`），作用只是兜底：涟漪、光标、对话框等 M3 内部取色不会出现默认紫色。业务代码不读取它。
 
 ### 2.2 字体层级（`Type.kt`）
 
@@ -303,9 +304,9 @@ dependencies {
 
 ---
 
-## Step 4：窗口宽度 → 导航形态（`core/adaptive/NavigationLayout.kt`）
+## Step 4：窗口宽度 → 导航形态（`core/adaptive/NavigationLayout.kt`）✅ 已完成
 
-把已暂存的空文件 `AdaptiveNavigationLayout.kt` 改名为 `NavigationLayout.kt`：
+`NavigationLayout.kt`（替换了原先空的 `AdaptiveNavigationLayout.kt`）：
 
 ```kotlin
 enum class NavigationLayout { BottomBar, MediumRail, ExpandedRail }
@@ -331,17 +332,28 @@ fun rememberNavigationLayout(): NavigationLayout {
 
 **单测**（`app/src/test/.../core/adaptive/NavigationLayoutTest.kt`）：
 
+用真实宽度（含 599 / 600 / 839 / 840 边界）测试，而不是只测断点桶的下限：
+
 ```kotlin
-@Test fun compact()  = assertEquals(BottomBar,    navigationLayoutFor(WindowSizeClass(minWidthDp = 0,   minHeightDp = 0)))
-@Test fun medium()   = assertEquals(MediumRail,   navigationLayoutFor(WindowSizeClass(minWidthDp = 600, minHeightDp = 0)))
-@Test fun expanded() = assertEquals(ExpandedRail, navigationLayoutFor(WindowSizeClass(minWidthDp = 840, minHeightDp = 0)))
+private fun layoutForWidth(widthDp: Float) =
+    navigationLayoutFor(WindowSizeClass.BREAKPOINTS_V1.computeWindowSizeClass(widthDp, 800f))
+
+@Test fun `width below 600dp uses bottom bar`() {
+    assertEquals(BottomBar, layoutForWidth(390f))
+    assertEquals(BottomBar, layoutForWidth(599f))
+}
+// 600 / 704 / 839 → MediumRail；840 / 1280 → ExpandedRail
 ```
+
+> `app/build.gradle.kts` 中显式依赖了 `androidx.window:window-core`（1.5.1），供 `NavigationLayout.kt` 与单测直接使用 `WindowSizeClass`。
 
 **提交：** `feat(adaptive): map window width to navigation layout`
 
 ---
 
-## Step 5：导航组件（`core/designsystem/component`）
+## Step 5：导航组件（`core/designsystem/component`）✅ 已完成
+
+已实现文件：`NavItem.kt`（数据 + 共用的 `NavItemIcon` / `NavItemLabel`）、`EchoPodNavigationBar.kt`、`RailStyle.kt`、`EchoPodNavigationRail.kt`，均带浅/深色 `@Preview`。
 
 基于 M3 的 `NavigationBar` / `NavigationRail` 封装——它们自带 Tab 语义、选中动画、48dp 热区与 insets 处理，而且默认尺寸（80dp 高、64×32 指示器、80dp Rail、56×32 指示器）与设计稿基本一致。封装成自有组件的好处是：调用方不感知 M3 细节，将来要换成完全自绘也只改这一处。
 
@@ -366,7 +378,8 @@ fun EchoPodNavigationBar(
 ) {
     NavigationBar(
         modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        containerColor = EchoPodTheme.colors.container,
+        contentColor = EchoPodTheme.colors.textSecondary,
         tonalElevation = 0.dp,
     ) {
         items.forEachIndexed { index, item ->
@@ -390,65 +403,95 @@ fun EchoPodNavigationBar(
 }
 ```
 
-`echoPodNavItemColors()`：选中图标 `onSecondaryContainer`、选中文字 `onSurface`、指示器 `secondaryContainer`、未选中图标/文字 `onSurfaceVariant`。`NavigationBar` 默认 `windowInsets` 已包含底部手势条，**不要**再在外面加 `navigationBarsPadding()`。
+`echoPodNavItemColors()` 全部取项目令牌：
+
+```kotlin
+@Composable
+internal fun echoPodNavItemColors(): NavigationBarItemColors {
+    val c = EchoPodTheme.colors
+    return NavigationBarItemDefaults.colors(
+        selectedIconColor = c.onBrandContainer,
+        selectedTextColor = c.textPrimary,
+        indicatorColor = c.brandContainer,
+        unselectedIconColor = c.textSecondary,
+        unselectedTextColor = c.textSecondary,
+    )
+}
+```
+
+`echoPodRailItemColors()` 同理，使用 `NavigationRailItemDefaults.colors(...)`。`NavigationBar` 默认 `windowInsets` 已包含底部手势条，**不要**再在外面加 `navigationBarsPadding()`。
 
 ### 5.2 `EchoPodNavigationRail`
 
-```kotlin
-enum class RailStyle(val width: Dp, val topPadding: Dp, val fabBottomSpacing: Dp, val itemSpacing: Dp, val transparent: Boolean) {
-    Medium(88.dp, 28.dp, 20.dp, 12.dp, transparent = false),
-    Expanded(80.dp, 20.dp, 16.dp, 8.dp, transparent = true),
-}
+`RailStyle` 中的数值都是设计稿的**最终视觉值**：
 
-@Composable
-fun EchoPodNavigationRail(
-    items: List<NavItem>,
-    selectedIndex: Int,
-    onItemClick: (Int) -> Unit,
-    onImportClick: () -> Unit,
-    importContentDescription: String,
-    style: RailStyle,
-    modifier: Modifier = Modifier,
+```kotlin
+enum class RailStyle(
+    val width: Dp,           // Rail 宽度
+    val topPadding: Dp,      // Rail 顶部 → FAB 顶部
+    val fabToFirstItem: Dp,  // FAB 底部 → 第一个导航项
+    val itemSpacing: Dp,     // 导航项之间
+    val transparent: Boolean,
 ) {
-    NavigationRail(
-        modifier = modifier.width(style.width),
-        containerColor = if (style.transparent) Color.Transparent else MaterialTheme.colorScheme.surfaceContainer,
-        header = {
-            FloatingActionButton(
-                onClick = onImportClick,
-                shape = RoundedCornerShape(16.dp),
-                containerColor = MaterialTheme.colorScheme.inverseSurface,
-                contentColor = MaterialTheme.colorScheme.inverseOnSurface,
-                elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
-                modifier = Modifier.padding(top = style.topPadding, bottom = style.fabBottomSpacing),
-            ) { Icon(painterResource(R.drawable.ic_add), contentDescription = importContentDescription) }
-        },
-    ) {
-        items.forEachIndexed { index, item ->
-            NavigationRailItem(
-                selected = index == selectedIndex,
-                onClick = { onItemClick(index) },
-                icon = { Icon(painterResource(item.iconRes), null, Modifier.size(22.dp)) },
-                label = { /* 同 5.1 */ },
-                colors = echoPodRailItemColors(),
-                modifier = Modifier.padding(vertical = style.itemSpacing / 2).height(60.dp),
-            )
-        }
+    Medium(width = 88.dp, topPadding = 28.dp, fabToFirstItem = 32.dp, itemSpacing = 12.dp, transparent = false),
+    Expanded(width = 80.dp, topPadding = 20.dp, fabToFirstItem = 24.dp, itemSpacing = 8.dp, transparent = true),
+}
+```
+
+M3 1.3.x 的 `NavigationRail` 内部自带间距：Column 上下 `4dp` padding、子项之间 `spacedBy(4dp)`、header 后再加 `8dp` Spacer。组件内用"设计值 − M3 内置值"补齐，得到与设计稿一致的最终间距：
+
+```kotlin
+private val M3RailColumnPadding = 4.dp
+private val M3RailItemSpacing = 4.dp
+private val M3RailHeaderToContent = M3RailItemSpacing + 8.dp + M3RailItemSpacing // 16dp
+
+NavigationRail(
+    // 背景画在外层，内部 Rail 透明 → 外层可以加 verticalScroll，矮窗口时可滚动且背景仍铺满
+    modifier = modifier.fillMaxHeight().width(style.width)
+        .background(if (style.transparent) Color.Transparent else EchoPodTheme.colors.container)
+        .verticalScroll(rememberScrollState()),
+    containerColor = Color.Transparent,
+    contentColor = EchoPodTheme.colors.textSecondary,
+    // 并入起始侧挖孔，横屏时摄像头不遮挡 Rail
+    windowInsets = NavigationRailDefaults.windowInsets
+        .union(WindowInsets.displayCutout.only(WindowInsetsSides.Start)),
+    header = {
+        ImportFab( // 56dp、圆角 16dp、inkButton / onInkButton、无阴影
+            onClick = onImportClick,
+            contentDescription = importContentDescription,
+            modifier = Modifier.padding(
+                top = style.topPadding - M3RailColumnPadding,
+                bottom = style.fabToFirstItem - M3RailHeaderToContent,
+            ),
+        )
+    },
+) {
+    val itemPadding = (style.itemSpacing - M3RailItemSpacing) / 2
+    items.forEachIndexed { index, item ->
+        NavigationRailItem(
+            selected = index == selectedIndex,
+            onClick = { onItemClick(index) },
+            icon = { NavItemIcon(item) },
+            label = { NavItemLabel(item, index == selectedIndex) },
+            colors = echoPodRailItemColors(),
+            modifier = Modifier.padding(vertical = itemPadding).height(60.dp),
+        )
     }
 }
 ```
 
 注意：
-- Rail 默认 `windowInsets` 只含系统栏；横屏时摄像头挖孔可能在左侧，需要 `windowInsets = NavigationRailDefaults.windowInsets.union(WindowInsets.displayCutout.only(WindowInsetsSides.Start))`。
-- **矮窗口**（横屏手机，高度 < 480dp）时 FAB + 4 项约 380dp 高，加上 insets 可能放不下：此时把 Rail 内容包进 `verticalScroll`，或用 `RailStyle.Expanded` 的紧凑间距。
-- 如果 M3 内部间距与设计稿有几 dp 偏差且无法接受，再在这个文件里改为自绘（`Column` + `Modifier.selectable(role = Role.Tab)`），对外 API 不变。
+- 升级 material3 后若 Rail 间距发生变化，先核对上面三个 M3 内置值。
+- 如果 M3 内部布局与设计稿的偏差无法接受，再在这个文件里改为自绘（`Column` + `Modifier.selectable(role = Role.Tab)`），对外 API 不变。
 
 **验证：** 为两个组件各写浅/深色 `@Preview`，与 PNG 并排比对。
 **提交：** `feat(designsystem): add EchoPodNavigationBar and EchoPodNavigationRail`
 
 ---
 
-## Step 6：路由与导航状态（`presentation/navigation`）
+## Step 6：路由与导航状态（`presentation/navigation`）✅ 已完成
+
+已实现文件：`TopLevelDestination.kt`、`EchoPodAppState.kt`、`EchoPodNavHost.kt`。为了让 `NavHost` 能编译，同时创建了 4 个占位页面（`presentation/feature/*/XxxScreen.kt`，共用 `feature/common/TopLevelPlaceholder.kt`：大标题 + 50 项可滚动列表），Step 10 在此基础上补充 insets 与首页导入按钮。
 
 ### 6.1 `TopLevelDestination.kt`
 
@@ -620,7 +663,13 @@ class TogglePlaybackUseCase(private val repo: PlaybackRepository) {
 
 ---
 
-## Step 9：自适应外壳（`presentation/shell/EchoPodAppShell.kt` + `EchoPodApp.kt`）
+## Step 9：自适应外壳（`presentation/shell/EchoPodAppShell.kt` + `EchoPodApp.kt`）✅ 基础版已完成
+
+已提前于 Step 7 / 8 实现，`MainActivity` 已接入（`setContent { EchoPodTheme { EchoPodApp() } }`），三种形态可在设备上切换。尚待补充：
+- `onImportClick` 目前为空操作，Step 7 完成后改为 `viewModel.onEvent(MainShellEvent.ImportClicked)` 并显示导入弹窗；
+- `miniPlayer` 槽位默认为空，Step 8 完成后接入。
+
+已在 Pixel 10 Pro Fold 模拟器验证：折叠（外屏，Compact）→ 展开（≈852dp，Expanded）→ 强制 704dp（Medium）→ 恢复，当前 Tab 与滚动位置均保持。
 
 ### 9.1 无状态外壳
 
@@ -634,12 +683,13 @@ fun EchoPodAppShell(
     selectedIndex: Int,
     onItemClick: (Int) -> Unit,
     onImportClick: () -> Unit,
-    miniPlayer: @Composable (NavigationLayout) -> Unit,
+    modifier: Modifier = Modifier,
+    miniPlayer: @Composable BoxScope.(NavigationLayout) -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val windowBg = when (navigationLayout) {
-        NavigationLayout.ExpandedRail -> MaterialTheme.colorScheme.surfaceContainer
-        else -> MaterialTheme.colorScheme.background
+        NavigationLayout.ExpandedRail -> EchoPodTheme.colors.container
+        else -> EchoPodTheme.colors.background
     }
     Row(Modifier.fillMaxSize().background(windowBg)) {
         if (navigationLayout != NavigationLayout.BottomBar) {
@@ -650,7 +700,7 @@ fun EchoPodAppShell(
             )
         }
         Column(Modifier.weight(1f)) {
-            Box(Modifier.weight(1f).then(contentSurfaceModifier(navigationLayout))) {
+            Box(Modifier.weight(1f).then(contentAreaModifier(navigationLayout))) {
                 content()                         // ← NavHost 始终在同一个调用位置
                 miniPlayer(navigationLayout)      // Compact/Medium 下悬浮在内容底部
             }
@@ -662,9 +712,12 @@ fun EchoPodAppShell(
 }
 ```
 
-- `contentSurfaceModifier`：Expanded 时为 `padding(top = 8.dp, end = 8.dp, bottom = 8.dp).clip(RoundedCornerShape(24.dp)).background(background)`（纸面效果），其余形态为 `Modifier`。
+- `contentAreaModifier`（只改 Modifier，不改组合结构）：
+  - BottomBar：`consumeWindowInsets(WindowInsets.navigationBars)`——手势条已由底部导航栏处理；
+  - MediumRail：`consumeWindowInsets(safeDrawing.only(Start))`——起始侧已由 Rail 处理；
+  - ExpandedRail：同样消费起始侧，再 `windowInsetsPadding(safeDrawing.only(Top + End + Bottom))` → `padding(top/end/bottom = 8.dp)` → `clip(RoundedCornerShape(24.dp))` → `background(EchoPodTheme.colors.background)`，即避开系统栏的"纸面"。
 - **`content()` 必须处于固定的调用位置**：Bar/Rail 用 `if` 包裹并放在它前后，Compose 会给 `if` 块单独分组，`content()` 的身份不变；所以拖动分屏窗口、从 Medium 变成 Compact 时 `NavHost` 不会被销毁重建。千万不要写成 `when(layout) { BottomBar -> Scaffold { content() }; else -> Row { content() } }`——那样三个分支里的 `content()` 是三个不同实例，切换形态会丢页面状态。
-- **Insets**：Compact 下底部 inset 由 `NavigationBar` 消费；Rail 形态下底部手势条需要内容区自己处理——各页面列表用 `contentPadding` 加上 `WindowInsets.navigationBars` 底部值，不要整体 `safeDrawingPadding()`（会让背景色无法延伸到状态栏后面）。页面顶部同理，用 `WindowInsets.statusBars`。
+- **Insets**：外壳按上面的规则"消费" insets，页面在列表首尾放 `Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))` / `Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))`。这两个修饰符会自动扣除已消费的部分（Compact 底部为 0，Expanded 上下都为 0），列表内容仍可滚动到系统栏后面。**不要**用 `WindowInsets.xxx.asPaddingValues()`（它不感知消费，会重复留白），也不要整体 `safeDrawingPadding()`（背景无法延伸到系统栏后面）。
 - **迷你播放器位置**：Compact 时 `Modifier.align(BottomCenter).padding(horizontal = 8.dp, vertical = 8.dp)`，因为它在内容 `Box` 内、导航栏之上，自然满足"距导航栏 8dp"；Medium 时 `padding(horizontal = 24.dp, vertical = 16.dp)` 并额外加底部系统 inset；Expanded 时外壳**不渲染**（由首页的详情栏负责，Step 9 之后的任务）。页面列表需要在底部留出迷你播放器高度的 `contentPadding`，避免最后一项被挡住。
 
 ### 9.2 有状态入口 `EchoPodApp.kt`
@@ -673,7 +726,7 @@ fun EchoPodAppShell(
 @Composable
 fun EchoPodApp(
     appState: EchoPodAppState = rememberEchoPodAppState(),
-    viewModel: MainShellViewModel = viewModel(/* Step 8 后传 factory */),
+    viewModel: MainShellViewModel = viewModel(/* Step 8 后传 factory */), // Step 7 加入
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val destinations = TopLevelDestination.entries
@@ -705,13 +758,13 @@ fun EchoPodApp(
 
 ---
 
-## Step 10：占位页面
+## Step 10：占位页面（基础版已在 Step 6 完成）
 
-`presentation/feature/*/XxxScreen.kt` 各放一个占位页，内容刻意设计成方便验收：
+已有：4 个页面 + 共用的 `TopLevelPlaceholder`（大标题 + 50 项 `LazyColumn`，用来验证"切换 Tab / 折叠展开后滚动位置不丢"），目前只处理了状态栏 inset。本步骤待补：
 
-- 顶部大标题（首页 / 发现 / 订阅 / 我的），左右边距 Compact `16dp`、Medium `24dp`。
-- 一个 50 项的 `LazyColumn`（`rememberLazyListState()`），用来验证"切换 Tab / 折叠展开后滚动位置不丢"。
-- 首页标题栏在 **Compact** 下显示"+ 导入"按钮（高 `48dp`、圆角 `24dp`、`inverseSurface` 背景），通过 `onImportClick` 回调上抛；Medium/Expanded 下隐藏（Rail 已经有 FAB）。首页通过参数 `showImportButton: Boolean` 得知，不要在页面里自己读窗口尺寸。
+- 左右边距按形态区分：Compact `16dp`、Medium `24dp`。
+- 列表底部 `contentPadding`：Rail 形态加上 `WindowInsets.navigationBars` 底部值，并为迷你播放器留出高度。
+- 首页标题栏在 **Compact** 下显示"+ 导入"按钮（高 `48dp`、圆角 `24dp`、`EchoPodTheme.colors.inkButton` 背景、`onInkButton` 文字），通过 `onImportClick` 回调上抛；Medium/Expanded 下隐藏（Rail 已经有 FAB）。首页通过参数 `showImportButton: Boolean` 得知，不要在页面里自己读窗口尺寸。
 
 **提交：** `feat(feature): add placeholder top-level screens`
 
@@ -758,15 +811,15 @@ fun EchoPodApp(
 
 | # | 提交 | 可验证点 |
 |---|---|---|
-| 1 | `build: add adaptive, navigation, lifecycle and test dependencies` | 构建通过 |
+| 1 | `build: add adaptive, navigation, lifecycle and test dependencies` | 已完成 |
 | 2 | `feat(designsystem): implement Quiet Paper color, type and shape tokens` | 已完成 |
 | 3 | `feat(res): add navigation icons and strings` | 已完成 |
-| 4 | `feat(adaptive): map window width to navigation layout` | 单测 |
-| 5 | `feat(designsystem): add EchoPodNavigationBar and EchoPodNavigationRail` | Preview |
-| 6 | `feat(navigation): add top-level routes, NavHost and app state` | 构建通过 |
+| 4 | `feat(adaptive): map window width to navigation layout` | 已完成 |
+| 5 | `feat(designsystem): add EchoPodNavigationBar and EchoPodNavigationRail` | 已完成 |
+| 6 | `feat(navigation): add top-level routes, NavHost and app state` | 已完成 |
 | 7 | `feat(shell): add MainShellViewModel with saved import state` | 单测 |
 | 8 | `feat(playback): add now-playing domain, fake repository and shell wiring` | 单测（可推后） |
-| 9 | `feat(shell): add adaptive app shell with bar/rail switching` | 真机/模拟器三种宽度 |
+| 9 | `feat(shell): add adaptive app shell with bar/rail switching` | 基础版已完成（导入、迷你播放器待接入） |
 | 10 | `feat(feature): add placeholder top-level screens` | 连续性验收 |
 | 11 | `test: add shell UI tests` | `connectedDebugAndroidTest` |
 

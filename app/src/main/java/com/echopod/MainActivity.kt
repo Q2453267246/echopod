@@ -4,37 +4,24 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import com.echopod.core.designsystem.theme.EchoPodTheme
+import com.echopod.presentation.shell.EchoPodApp
 
+/**
+ * 应用唯一的 Activity。
+ *
+ * - enableEdgeToEdge()：内容绘制到状态栏 / 手势条后面，由外壳与各页面按需处理 WindowInsets，
+ *   因此这里**不要**整体加 safeDrawingPadding()，否则背景色无法延伸到系统栏后面；
+ * - 折叠/展开、旋转会触发 Activity 重建（Manifest 中没有锁定方向，也没有声明 configChanges），
+ *   导航返回栈与页面滚动位置通过 rememberSaveable / NavHost 的 saveState 自动恢复。
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             EchoPodTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
-                    Box(
-                        modifier = Modifier.safeDrawingPadding(),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = stringResource(R.string.hello_world),
-                            style = MaterialTheme.typography.headlineMedium,
-                        )
-                    }
-                }
+                EchoPodApp()
             }
         }
     }

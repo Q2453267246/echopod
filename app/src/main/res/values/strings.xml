@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">EchoPod</string>
-    <string name="hello_world">Hello World</string>
 
     <!-- 一级导航 -->
     <string name="nav_home">首页</string>
@@ -11,4 +10,7 @@
     <!-- 导入入口：Compact 为首页标题栏按钮文字，Medium/Expanded 为 Rail FAB 的无障碍描述 -->
     <string name="action_import">导入</string>
     <string name="action_import_podcast">导入播客</string>
+
+    <!-- 一级页面占位列表条目，如"订阅 · 第 12 项"（Step 10 之前使用） -->
+    <string name="placeholder_item">%1$s · 第 %2$d 项</string>
 </resources>

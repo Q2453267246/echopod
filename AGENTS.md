@@ -70,6 +70,7 @@ Reference: `EchoPod-设计稿/PNG/00-设计语言/01-设计语言-QuietPaper.png
 - **Colors**:
   - **Light**: Background `#F7F5F0`, Card `#FFFFFF`, Container `#EFECE5`, Primary Text `#1C1B19`, Secondary Text `#6B675F`, Outline `#E3DFD6`, Brand `#2E6B66`, Brand Container `#D6E7E3`, OnBrandContainer `#123A37`, Update Dot `#E4893F`.
   - **Dark**: Background `#131412`, Card `#22231F`, Container `#2A2B27`, Primary Text `#ECEAE4`, Secondary Text `#A3A098`, Outline `#33342F`, Brand `#86C6BD`, Brand Container `#1F3B38`, OnBrandContainer `#BFE3DD`, Update Dot `#F0A060`.
+  - **Usage rule**: In all UI code and in code samples in `docs/`, read colors only from the project tokens `EchoPodTheme.colors.xxx` (`EchoPodColors` in `core/designsystem/theme/Color.kt`). **Never** use `MaterialTheme.colorScheme.xxx` or hard-coded `Color(0x...)` outside `Color.kt`. When using Material 3 components, pass colors explicitly from the tokens (e.g. `NavigationBarItemDefaults.colors(selectedIconColor = EchoPodTheme.colors.onBrandContainer, ...)`) instead of relying on M3 defaults. The Material `ColorScheme` is derived from the tokens only as an internal fallback.
 - **Touch Targets**: Every interactive element must have a minimum touch target of `48dp × 48dp`.
 - **Icons**: `24dp` outline icons, `1.8dp` stroke width, rounded caps.
 - **Motion**: `200ms` for buttons/selection states, `300ms` for page transitions/bottom sheets.
