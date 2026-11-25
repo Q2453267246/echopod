@@ -77,50 +77,25 @@ fun EchoPodAppShell(
     miniPlayer: @Composable BoxScope.(NavigationLayout) -> Unit = {},
     content: @Composable () -> Unit,
 ) {
-    val colors = EchoPodTheme.colors
-    // Expanded 时整窗是 container 底色，内容区是浮在上面的纸面；其余形态整窗即页面底色
-    val windowBackground = when (navigationLayout) {
-        NavigationLayout.ExpandedRail -> colors.container
-        else -> colors.background
+    val windowBg = when (navigationLayout) {
+        NavigationLayout.ExpandedRail -> EchoPodTheme.colors.container
+        else -> EchoPodTheme.colors.background
     }
-
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(windowBackground),
-    ) {
+    Row(modifier.fillMaxSize().background(windowBg)) {
         if (navigationLayout != NavigationLayout.BottomBar) {
             EchoPodNavigationRail(
-                items = items,
-                selectedIndex = selectedIndex,
-                onItemClick = onItemClick,
-                onImportClick = onImportClick,
+                items, selectedIndex, onItemClick, onImportClick,
                 importContentDescription = stringResource(R.string.action_import_podcast),
                 style = if (navigationLayout == NavigationLayout.MediumRail) RailStyle.Medium else RailStyle.Expanded,
             )
         }
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .then(contentAreaModifier(navigationLayout)),
-            ) {
-                content() // ← NavHost 始终在这里，调用位置不随导航形态变化
-                miniPlayer(navigationLayout)
+        Column(Modifier.weight(1f)) {
+            Box(Modifier.weight(1f).then(contentAreaModifier(navigationLayout))) {
+                content()                         // ← NavHost 始终在同一个调用位置
+                miniPlayer(navigationLayout)      // Compact/Medium 下悬浮在内容底部
             }
-
             if (navigationLayout == NavigationLayout.BottomBar) {
-                EchoPodNavigationBar(
-                    items = items,
-                    selectedIndex = selectedIndex,
-                    onItemClick = onItemClick,
-                )
+                EchoPodNavigationBar(items, selectedIndex, onItemClick)
             }
         }
     }

@@ -3,6 +3,8 @@ package com.echopod.presentation.feature.discover
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.echopod.R
 import com.echopod.presentation.feature.common.TopLevelPlaceholder
 
@@ -13,9 +15,15 @@ import com.echopod.presentation.feature.common.TopLevelPlaceholder
  * 真实内容实现时，按 MVVM 增加 DiscoverViewModel + DiscoverUiState，本函数改为接收 state 与事件回调。
  */
 @Composable
-fun DiscoverScreen(modifier: Modifier = Modifier) {
+fun DiscoverScreen(
+    horizontalPadding: Dp = 16.dp,
+    bottomExtraPadding: Dp = 0.dp,
+    modifier: Modifier = Modifier,
+) {
     TopLevelPlaceholder(
         title = stringResource(R.string.nav_discover),
+        horizontalPadding = horizontalPadding,
+        bottomExtraPadding = bottomExtraPadding,
         modifier = modifier,
     )
 }

@@ -1,6 +1,7 @@
 package com.echopod.presentation.feature.common
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,9 +17,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.echopod.R
 import com.echopod.core.designsystem.theme.EchoPodTheme
@@ -45,23 +48,33 @@ private const val PlaceholderItemCount = 50
 @Composable
 fun TopLevelPlaceholder(
     title: String,
+    horizontalPadding: Dp = 16.dp,
+    bottomExtraPadding: Dp = 0.dp,
+    titleAction: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
         state = rememberLazyListState(),
         modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(top = 20.dp, bottom = 16.dp),
+        contentPadding = PaddingValues(top = 20.dp, bottom = 16.dp + bottomExtraPadding),
     ) {
         item(key = "top-inset") {
             Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))
         }
         item(key = "title") {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.headlineMedium,
-                color = EchoPodTheme.colors.textPrimary,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = horizontalPadding, vertical = 8.dp)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = EchoPodTheme.colors.textPrimary,
+                    modifier = Modifier.weight(1f),
+                )
+                titleAction?.invoke()
+            }
         }
         items(count = PlaceholderItemCount, key = { it }) { index ->
             Text(
@@ -70,10 +83,10 @@ fun TopLevelPlaceholder(
                 color = EchoPodTheme.colors.textSecondary,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                    .padding(horizontal = horizontalPadding, vertical = 14.dp),
             )
             HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = horizontalPadding),
                 color = EchoPodTheme.colors.divider,
             )
         }
@@ -83,7 +96,13 @@ fun TopLevelPlaceholder(
     }
 }
 
-@Preview(name = "Placeholder · Light", widthDp = 390, heightDp = 600, showBackground = true, backgroundColor = 0xFFF7F5F0)
+@Preview(
+    name = "Placeholder · Light",
+    widthDp = 390,
+    heightDp = 600,
+    showBackground = true,
+    backgroundColor = 0xFFF7F5F0
+)
 @Composable
 private fun TopLevelPlaceholderPreview() {
     EchoPodTheme(darkTheme = false) {

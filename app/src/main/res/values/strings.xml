@@ -11,6 +11,10 @@
     <string name="action_import">导入</string>
     <string name="action_import_podcast">导入播客</string>
 
+    <!-- 导入弹窗（占位，真实导入流程实现前使用） -->
+    <string name="import_dialog_placeholder_message">支持通过 RSS 链接或 OPML 文件导入播客，功能开发中。</string>
+    <string name="action_close">关闭</string>
+
     <!-- 一级页面占位列表条目，如"订阅 · 第 12 项"（Step 10 之前使用） -->
     <string name="placeholder_item">%1$s · 第 %2$d 项</string>
 </resources>

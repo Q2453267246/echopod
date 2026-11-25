@@ -95,6 +95,7 @@ presentation ──► domain ◄── data
 | `core/adaptive` | 窗口宽度 → `NavigationLayout` 的映射（纯函数，可 JVM 单测） |
 | `presentation` | 路由、`EchoPodAppState`（导航 UI 逻辑）、`MainShellViewModel` + `MainShellUiState`、外壳 Composable、占位页面 |
 | `domain` + `data` | 外壳里**唯一**需要业务数据的是迷你播放器 → 用它打通第一条完整链路：`PlaybackRepository` 接口 → 假数据实现 → UseCase → ViewModel（Step 8，可单独提交） |
+| `di` | **Hilt** 负责组装：`@HiltViewModel` 注入 ViewModel，`@Binds` 把 data 层实现绑定到 domain 接口（Step 7 接入，Step 8 添加第一个模块） |
 
 ### 2.2 状态归属（避免"双数据源"）
 
@@ -110,10 +111,10 @@ presentation ──► domain ◄── data
 
 ```text
 app/src/main/java/com/echopod/
-├── EchoPodApplication.kt                  # 持有 AppContainer（Step 8）
+├── EchoPodApplication.kt                  # @HiltAndroidApp（Step 7）
 ├── MainActivity.kt
 ├── di/
-│   └── AppContainer.kt                    # 手动 DI（Step 8）
+│   └── PlaybackModule.kt                  # Hilt 模块：@Binds 仓库接口 → 实现（Step 8）
 ├── core/
 │   ├── adaptive/
 │   │   └── NavigationLayout.kt            # 替换当前空的 AdaptiveNavigationLayout.kt
@@ -575,7 +576,80 @@ fun EchoPodNavHost(appState: EchoPodAppState, modifier: Modifier = Modifier) {
 
 ---
 
-## Step 7：外壳 ViewModel（`presentation/shell`）
+## Step 7：接入 Hilt + 外壳 ViewModel（`presentation/shell`）✅ 已完成
+
+ViewModel 统一通过 **Hilt** 注入：ViewModel 用 `@HiltViewModel` + `@Inject constructor` 声明依赖，Compose 里用 `hiltViewModel()` 获取。这样以后加 Repository / UseCase 只需写一个 Hilt 模块，不用手写 Factory 或 DI 容器。
+
+### 7.1 添加 Hilt（`libs.versions.toml`、根 / app `build.gradle.kts`）✅ 已完成
+
+以下版本组合已在本项目（Kotlin 2.2.21、AGP 8.13.2、compileSdk 35）上编译通过并在模拟器上启动验证：
+
+```toml
+[versions]
+hilt = "2.57.2"
+ksp = "2.2.21-2.0.5"                 # 前半段必须与 Kotlin 版本一致
+hilt-navigation-compose = "1.2.0"    # 提供 hiltViewModel()
+
+[libraries]
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+
+[plugins]
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+```
+
+根 `build.gradle.kts`：
+
+```kotlin
+plugins {
+    // ...已有
+    alias(libs.plugins.hilt) apply false
+    alias(libs.plugins.ksp) apply false
+}
+```
+
+`app/build.gradle.kts`：
+
+```kotlin
+plugins {
+    // ...已有
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+}
+
+dependencies {
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)                    // 用 KSP，不用 kapt
+    implementation(libs.hilt.navigation.compose)
+}
+```
+
+> 版本说明：`androidx.hilt` 1.3.0 起把 `hiltViewModel()` 迁到了新的 `hilt-lifecycle-viewmodel-compose` 库，并可能要求更高的 compileSdk；当前项目先用 1.2.0（`import androidx.hilt.navigation.compose.hiltViewModel`），升级 compileSdk 时再一起迁移。
+
+### 7.2 Application 与 Activity ✅ 已完成
+
+```kotlin
+// EchoPodApplication.kt —— 替换当前的空类
+@HiltAndroidApp
+class EchoPodApplication : Application()
+```
+
+```xml
+<!-- AndroidManifest.xml -->
+<application
+    android:name=".EchoPodApplication"
+    ... >
+```
+
+```kotlin
+// MainActivity.kt —— 加注解，其余不变
+@AndroidEntryPoint
+class MainActivity : ComponentActivity() { ... }
+```
+
+### 7.3 `MainShellViewModel` ✅ 已完成
 
 先只管导入弹窗；迷你播放器字段在 Step 8 加入。
 
@@ -586,8 +660,14 @@ data class MainShellUiState(
     // Step 8: val nowPlaying: NowPlaying? = null,
 )
 
-class MainShellViewModel(
-    private val savedStateHandle: SavedStateHandle,
+sealed interface MainShellEvent {
+    data object ImportClicked : MainShellEvent
+    data object ImportDismissed : MainShellEvent
+}
+
+@HiltViewModel
+class MainShellViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,   // Hilt 自动提供，无需在模块中声明
 ) : ViewModel() {
 
     val uiState: StateFlow<MainShellUiState> =
@@ -604,24 +684,37 @@ class MainShellViewModel(
 
     private companion object { const val KEY_IMPORT_VISIBLE = "import_visible" }
 }
-
-sealed interface MainShellEvent {
-    data object ImportClicked : MainShellEvent
-    data object ImportDismissed : MainShellEvent
-}
 ```
 
 - 用 `SavedStateHandle` 保存：折叠/展开导致 Activity 重建、甚至进程被回收后，弹窗状态都还在。
-- 只有 `SavedStateHandle` 一个构造参数时，默认的 `viewModel()` 工厂即可创建，无需手动 Factory。
 - 导入入口有两处：Compact 在首页标题栏（"+ 导入"按钮，由首页通过回调上抛），Medium/Expanded 在 Rail 顶部 FAB。**两处都发同一个 `ImportClicked` 事件**。
 
-**单测**（`MainShellViewModelTest`）：初始不可见；`ImportClicked` 后可见；`ImportDismissed` 后不可见；用预置 `SavedStateHandle(mapOf("import_visible" to true))` 构造时恢复为可见。
+### 7.4 在 `EchoPodApp` 中获取 ✅ 已完成
 
-**提交：** `feat(shell): add MainShellViewModel with saved import state`
+```kotlin
+@Composable
+fun EchoPodApp(
+    appState: EchoPodAppState = rememberEchoPodAppState(),
+    viewModel: MainShellViewModel = hiltViewModel(),
+) { ... onImportClick = { viewModel.onEvent(MainShellEvent.ImportClicked) } ... }
+```
+
+- `hiltViewModel()` 在 `NavHost` **外面**调用 → ViewModel 作用域是 Activity，整个外壳共用一个实例。
+- 以后各页面的 ViewModel 在 `composable<XxxRoute> { XxxScreen(viewModel = hiltViewModel()) }` 里获取 → 作用域是该页面的返回栈条目，离开页面后自动清理。
+- `viewModel` 作为参数暴露，测试时可以直接传入手动构造的实例（见 Step 11）。
+- 弹窗目前是占位的 `ImportPlaceholderDialog`（`presentation/shell`，颜色全部取自 `EchoPodTheme.colors`），真实导入流程实现时替换。
+
+**单测**（`MainShellViewModelTest`，✅ 已完成）：**不需要 Hilt**，直接 `MainShellViewModel(SavedStateHandle())` 构造。断言：初始不可见；`ImportClicked` 后可见；`ImportDismissed` 后不可见；用预置 `SavedStateHandle(mapOf("import_visible" to true))` 构造时恢复为可见。
+
+**提交：**
+1. `build: set up Hilt with KSP`（7.1 + 7.2）
+2. `feat(shell): add MainShellViewModel with saved import state`（7.3 + 7.4）
 
 ---
 
-## Step 8：迷你播放器的 Clean Architecture 链路（可单独提交，也可推后）
+## Step 8：迷你播放器的 Clean Architecture 链路（可单独提交，也可推后）✅ 链路已完成（`MiniPlayer` UI 待实现）
+
+进度：domain（`NowPlaying`、`PlaybackRepository`、`ObserveNowPlayingUseCase` / `TogglePlaybackUseCase` / `SeekPlaybackUseCase`）、data（`FakePlaybackRepository`）、di（`PlaybackModule`）、`MainShellViewModel` 的 combine 与播放事件、单测均已完成。**待做**：`MiniPlayer` Composable，并在 `EchoPodApp` 中接入 `miniPlayer` 槽位、给 `EchoPodNavHost` 传 `hasMiniPlayer`。
 
 外壳里唯一的业务数据是"正在播放"。用它打通 domain → data → presentation 的完整链路，以后接 Media3 时只替换 data 层。如果只想先交付导航栏，跳过本步，外壳的 `miniPlayer` 槽位传空即可。
 
@@ -643,35 +736,67 @@ interface PlaybackRepository {
     suspend fun seekBy(seconds: Int)
 }
 
-class ObserveNowPlayingUseCase(private val repo: PlaybackRepository) {
+class ObserveNowPlayingUseCase @Inject constructor(private val repo: PlaybackRepository) {
     operator fun invoke(): Flow<NowPlaying?> = repo.nowPlaying
 }
-class TogglePlaybackUseCase(private val repo: PlaybackRepository) {
+class TogglePlaybackUseCase @Inject constructor(private val repo: PlaybackRepository) {
     suspend operator fun invoke() = repo.togglePlayPause()
+}
+class SeekPlaybackUseCase @Inject constructor(private val repo: PlaybackRepository) {
+    suspend operator fun invoke(seconds: Int) = repo.seekBy(seconds)   // 快退 -15 / 快进 +30
 }
 ```
 
+> `@Inject` 来自 `javax.inject`（JSR-330 标准注解，纯 Java，不属于 Android / AndroidX），因此 domain 层仍符合"纯 Kotlin"约束。UseCase 有 `@Inject constructor` 后，Hilt 能直接创建它，不需要再写 `@Provides`。
+
 **data：** `FakePlaybackRepository` 用 `MutableStateFlow` 持有设计稿中的示例（《在深夜写代码的人，都在想些什么》· 夜航电台 · 1.2x · 剩余 23 分钟）。
 
-**di：** `AppContainer` 创建 Repository 与 UseCase；`EchoPodApplication` 持有它（记得在 Manifest 写 `android:name=".EchoPodApplication"`）。此时 `MainShellViewModel` 多了构造参数，用 `viewModelFactory { initializer { MainShellViewModel(createSavedStateHandle(), container.observeNowPlaying, container.togglePlayback) } }` 创建。
+```kotlin
+@Singleton  // 播放状态全局唯一
+class FakePlaybackRepository @Inject constructor() : PlaybackRepository { ... }
+```
+
+**di（`di/PlaybackModule.kt`）：** 用 `@Binds` 把 domain 接口绑定到 data 实现。以后换成 Media3 实现时，只改这一行绑定：
+
+```kotlin
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class PlaybackModule {
+    @Binds
+    @Singleton
+    abstract fun bindPlaybackRepository(impl: FakePlaybackRepository): PlaybackRepository
+}
+```
+
+**ViewModel：** 只需在构造函数里加参数，`EchoPodApp` 中的 `hiltViewModel()` 调用**不用改**：
+
+```kotlin
+@HiltViewModel
+class MainShellViewModel @Inject constructor(
+    private val savedStateHandle: SavedStateHandle,
+    observeNowPlaying: ObserveNowPlayingUseCase,
+    private val togglePlayback: TogglePlaybackUseCase,
+    private val seekPlayback: SeekPlaybackUseCase,
+) : ViewModel() { ... }
+```
 
 **presentation：** `MainShellUiState` 增加 `nowPlaying: NowPlaying?`，用 `combine(savedStateHandle.getStateFlow(...), observeNowPlaying())` 生成；事件增加 `TogglePlayback`、`SeekBack`、`SeekForward`。`MiniPlayer` Composable 放在 `presentation/shell`，只接收数据与回调，`showSkipButtons` 参数控制 Medium 下的快退/快进按钮。
 
-**单测：** UseCase 各一个（用 Fake 仓库）；ViewModel 用 `runTest` + `UnconfinedTestDispatcher`（`Dispatchers.setMain`）断言 `nowPlaying` 能透传、`TogglePlayback` 会调用到仓库。
+**单测（✅ 已完成）：** 仍然不需要 Hilt——手动 `new` 出 Fake 仓库、UseCase 与 ViewModel。UseCase 各一个；ViewModel 用 `runTest` + `UnconfinedTestDispatcher`（`Dispatchers.setMain`）断言 `nowPlaying` 能透传、`TogglePlayback` 会调用到仓库。
 
 **提交：** `feat(playback): add now-playing domain, fake repository and shell wiring`
 
 ---
 
-## Step 9：自适应外壳（`presentation/shell/EchoPodAppShell.kt` + `EchoPodApp.kt`）✅ 基础版已完成
+## Step 9：自适应外壳（`presentation/shell/EchoPodAppShell.kt` + `EchoPodApp.kt`）✅ 已完成（迷你播放器待 Step 8 UI）
 
-已提前于 Step 7 / 8 实现，`MainActivity` 已接入（`setContent { EchoPodTheme { EchoPodApp() } }`），三种形态可在设备上切换。尚待补充：
-- `onImportClick` 目前为空操作，Step 7 完成后改为 `viewModel.onEvent(MainShellEvent.ImportClicked)` 并显示导入弹窗；
-- `miniPlayer` 槽位默认为空，Step 8 完成后接入。
+`MainActivity` 已接入（`setContent { EchoPodTheme { EchoPodApp() } }`），三种形态可在设备上切换。
+- ✅ 导入：Rail FAB 与 Compact 首页按钮都发 `MainShellEvent.ImportClicked`，显示 `ImportPlaceholderDialog`；
+- ⏳ `miniPlayer` 槽位仍为空，等 Step 8 的 `MiniPlayer` Composable 完成后接入。
 
 已在 Pixel 10 Pro Fold 模拟器验证：折叠（外屏，Compact）→ 展开（≈852dp，Expanded）→ 强制 704dp（Medium）→ 恢复，当前 Tab 与滚动位置均保持。
 
-### 9.1 无状态外壳
+### 9.1 无状态外壳 ✅ 已完成
 
 外壳**不读取窗口尺寸、不持有 ViewModel**，只根据传入的 `navigationLayout` 摆放——这样 UI 测试可以直接指定任意形态。
 
@@ -691,7 +816,7 @@ fun EchoPodAppShell(
         NavigationLayout.ExpandedRail -> EchoPodTheme.colors.container
         else -> EchoPodTheme.colors.background
     }
-    Row(Modifier.fillMaxSize().background(windowBg)) {
+    Row(modifier.fillMaxSize().background(windowBg)) {   // 记得使用调用方传入的 modifier
         if (navigationLayout != NavigationLayout.BottomBar) {
             EchoPodNavigationRail(
                 items, selectedIndex, onItemClick, onImportClick,
@@ -720,28 +845,30 @@ fun EchoPodAppShell(
 - **Insets**：外壳按上面的规则"消费" insets，页面在列表首尾放 `Spacer(Modifier.windowInsetsTopHeight(WindowInsets.statusBars))` / `Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))`。这两个修饰符会自动扣除已消费的部分（Compact 底部为 0，Expanded 上下都为 0），列表内容仍可滚动到系统栏后面。**不要**用 `WindowInsets.xxx.asPaddingValues()`（它不感知消费，会重复留白），也不要整体 `safeDrawingPadding()`（背景无法延伸到系统栏后面）。
 - **迷你播放器位置**：Compact 时 `Modifier.align(BottomCenter).padding(horizontal = 8.dp, vertical = 8.dp)`，因为它在内容 `Box` 内、导航栏之上，自然满足"距导航栏 8dp"；Medium 时 `padding(horizontal = 24.dp, vertical = 16.dp)` 并额外加底部系统 inset；Expanded 时外壳**不渲染**（由首页的详情栏负责，Step 9 之后的任务）。页面列表需要在底部留出迷你播放器高度的 `contentPadding`，避免最后一项被挡住。
 
-### 9.2 有状态入口 `EchoPodApp.kt`
+### 9.2 有状态入口 `EchoPodApp.kt` ✅ 已完成
 
 ```kotlin
 @Composable
 fun EchoPodApp(
     appState: EchoPodAppState = rememberEchoPodAppState(),
-    viewModel: MainShellViewModel = viewModel(/* Step 8 后传 factory */), // Step 7 加入
+    viewModel: MainShellViewModel = hiltViewModel(), // Step 7 加入
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val destinations = TopLevelDestination.entries
+    val destinations = appState.topLevelDestinations
     val items = destinations.map { NavItem(stringResource(it.labelRes), it.iconRes) }
     val selected = appState.currentTopLevelDestination
+    // 两个导入入口（Compact 首页按钮、Rail FAB）发同一个事件
+    val onImportClick = { viewModel.onEvent(MainShellEvent.ImportClicked) }
 
     EchoPodAppShell(
         navigationLayout = appState.navigationLayout,
         items = items,
         selectedIndex = destinations.indexOf(selected),
         onItemClick = { appState.navigateToTopLevel(destinations[it]) },
-        onImportClick = { viewModel.onEvent(MainShellEvent.ImportClicked) },
-        miniPlayer = { layout -> /* uiState.nowPlaying?.let { MiniPlayer(...) } */ },
+        onImportClick = onImportClick,
+        // TODO(Step 8)：miniPlayer = { layout -> uiState.nowPlaying?.let { MiniPlayer(...) } }
     ) {
-        EchoPodNavHost(appState)
+        EchoPodNavHost(appState = appState, onImportClick = onImportClick)
     }
 
     if (uiState.isImportSheetVisible) {
@@ -758,13 +885,13 @@ fun EchoPodApp(
 
 ---
 
-## Step 10：占位页面（基础版已在 Step 6 完成）
+## Step 10：占位页面 ✅ 已完成
 
-已有：4 个页面 + 共用的 `TopLevelPlaceholder`（大标题 + 50 项 `LazyColumn`，用来验证"切换 Tab / 折叠展开后滚动位置不丢"），目前只处理了状态栏 inset。本步骤待补：
+4 个页面 + 共用的 `TopLevelPlaceholder`（大标题 + 50 项 `LazyColumn`，用来验证"切换 Tab / 折叠展开后滚动位置不丢"）。以下参数都由 `EchoPodNavHost` 按导航形态算好后传给页面，页面不读窗口尺寸：
 
-- 左右边距按形态区分：Compact `16dp`、Medium `24dp`。
-- 列表底部 `contentPadding`：Rail 形态加上 `WindowInsets.navigationBars` 底部值，并为迷你播放器留出高度。
-- 首页标题栏在 **Compact** 下显示"+ 导入"按钮（高 `48dp`、圆角 `24dp`、`EchoPodTheme.colors.inkButton` 背景、`onInkButton` 文字），通过 `onImportClick` 回调上抛；Medium/Expanded 下隐藏（Rail 已经有 FAB）。首页通过参数 `showImportButton: Boolean` 得知，不要在页面里自己读窗口尺寸。
+- ✅ 左右边距按形态区分：Compact `16dp`、Medium / Expanded `24dp`（`horizontalPadding`，4 个页面都已接入）。
+- ✅ 列表底部：系统 inset 由列表末尾的 `windowInsetsBottomHeight(navigationBars)` 处理（会自动扣除外壳已消费的部分）；迷你播放器高度由 `bottomExtraPadding` 预留（Compact 72dp、Medium 84dp），Step 8 接入 `hasMiniPlayer` 后生效。
+- ✅ 首页标题栏在 **Compact** 下显示"+ 导入"按钮（高 `48dp`、圆角 `24dp`、`EchoPodTheme.colors.inkButton` 背景、`onInkButton` 文字），通过 `onImportClick` 回调上抛；Medium/Expanded 下隐藏（Rail 已经有 FAB）。首页通过参数 `showImportButton: Boolean` 得知，不要在页面里自己读窗口尺寸。
 
 **提交：** `feat(feature): add placeholder top-level screens`
 
@@ -772,15 +899,15 @@ fun EchoPodApp(
 
 ## Step 11：测试与验收
 
-### 11.1 JVM 单元测试（`./gradlew :app:testDebugUnitTest`）
+### 11.1 JVM 单元测试（`./gradlew :app:testDebugUnitTest`）✅ 已完成
 
 | 测试类 | 覆盖内容 |
 |---|---|
-| `NavigationLayoutTest` | 0 / 599 / 600 / 839 / 840 / 1200dp 边界映射 |
-| `MainShellViewModelTest` | 导入弹窗事件、`SavedStateHandle` 恢复、（Step 8 后）nowPlaying 透传与播放切换 |
-| `ObserveNowPlayingUseCaseTest` / `TogglePlaybackUseCaseTest` | Step 8 的 UseCase |
+| `NavigationLayoutTest` ✅ | 0 / 390 / 599 / 600 / 704 / 839 / 840 / 1280dp 边界映射 |
+| `MainShellViewModelTest` ✅ | 导入弹窗事件、`SavedStateHandle` 恢复、nowPlaying 透传与播放切换 |
+| `PlaybackUseCasesTest` ✅ | Step 8 的三个 UseCase（观察、播放切换、快进快退及进度边界） |
 
-### 11.2 Compose UI 测试（`./gradlew :app:connectedDebugAndroidTest`，需要设备）
+### 11.2 Compose UI 测试（`./gradlew :app:connectedDebugAndroidTest`，需要设备）⏳ 待实现
 
 `EchoPodAppShellTest` 直接给无状态外壳传入不同的 `NavigationLayout`，不依赖真实设备宽度：
 
@@ -789,7 +916,7 @@ fun EchoPodApp(
 - 点击"订阅"→ 回调收到索引 2，且该项 `assertIsSelected()`。
 - 所有导航项与 FAB：`assertHeightIsAtLeast(48.dp)` 与 `assertWidthIsAtLeast(48.dp)`。
 
-另写一个 `EchoPodAppTest`（带真实 NavHost）：切到"订阅"→ 滚动列表 → 切到"首页"→ 切回"订阅"，断言列表仍在滚动后的位置；再用 `StateRestorationTester` 模拟重建，断言选中 Tab 与滚动位置仍在。
+另写一个 `EchoPodAppTest`（带真实 NavHost）。`createComposeRule()` 的宿主 Activity 不是 `@AndroidEntryPoint`，不能调用 `hiltViewModel()`，因此测试里显式传入 `EchoPodApp(viewModel = MainShellViewModel(SavedStateHandle()))`，无需引入 Hilt 测试库。测试内容：切到"订阅"→ 滚动列表 → 切到"首页"→ 切回"订阅"，断言列表仍在滚动后的位置；再用 `StateRestorationTester` 模拟重建，断言选中 Tab 与滚动位置仍在。
 
 ### 11.3 人工验收清单
 
@@ -817,11 +944,12 @@ fun EchoPodApp(
 | 4 | `feat(adaptive): map window width to navigation layout` | 已完成 |
 | 5 | `feat(designsystem): add EchoPodNavigationBar and EchoPodNavigationRail` | 已完成 |
 | 6 | `feat(navigation): add top-level routes, NavHost and app state` | 已完成 |
-| 7 | `feat(shell): add MainShellViewModel with saved import state` | 单测 |
-| 8 | `feat(playback): add now-playing domain, fake repository and shell wiring` | 单测（可推后） |
-| 9 | `feat(shell): add adaptive app shell with bar/rail switching` | 基础版已完成（导入、迷你播放器待接入） |
-| 10 | `feat(feature): add placeholder top-level screens` | 连续性验收 |
-| 11 | `test: add shell UI tests` | `connectedDebugAndroidTest` |
+| 7a | `build: set up Hilt with KSP` | 已完成 |
+| 7b | `feat(shell): add MainShellViewModel with saved import state` | 已完成（单测通过） |
+| 8 | `feat(playback): add now-playing domain, fake repository and shell wiring` | 链路与单测已完成，`MiniPlayer` UI 待做 |
+| 9 | `feat(shell): add adaptive app shell with bar/rail switching` | 已完成（迷你播放器待接入） |
+| 10 | `feat(feature): add placeholder top-level screens` | 已完成 |
+| 11 | `test: add shell UI tests` | JVM 单测已完成；UI 测试待做 |
 
 每次提交前执行：
 

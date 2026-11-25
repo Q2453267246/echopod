@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.echopod.core.designsystem.theme.EchoPodTheme
 import com.echopod.presentation.shell.EchoPodApp
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * 应用唯一的 Activity。
@@ -15,6 +16,7 @@ import com.echopod.presentation.shell.EchoPodApp
  * - 折叠/展开、旋转会触发 Activity 重建（Manifest 中没有锁定方向，也没有声明 configChanges），
  *   导航返回栈与页面滚动位置通过 rememberSaveable / NavHost 的 saveState 自动恢复。
  */
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
