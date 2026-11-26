@@ -714,7 +714,7 @@ fun EchoPodApp(
 
 ## Step 8：迷你播放器的 Clean Architecture 链路（可单独提交，也可推后）✅ 链路已完成（`MiniPlayer` UI 待实现）
 
-进度：domain（`NowPlaying`、`PlaybackRepository`、`ObserveNowPlayingUseCase` / `TogglePlaybackUseCase` / `SeekPlaybackUseCase`）、data（`FakePlaybackRepository`）、di（`PlaybackModule`）、`MainShellViewModel` 的 combine 与播放事件、单测均已完成。**待做**：`MiniPlayer` Composable，并在 `EchoPodApp` 中接入 `miniPlayer` 槽位、给 `EchoPodNavHost` 传 `hasMiniPlayer`。
+进度：domain（`NowPlaying`、`PlaybackRepository`、`ObserveNowPlayingUseCase` / `TogglePlaybackUseCase` / `SeekPlaybackUseCase`）、data（`FakePlaybackRepository`）、di（`PlaybackModule`）、`MainShellViewModel` 的 combine 与播放事件、单测均已完成。**待做**：`MiniPlayer` Composable，并在 `EchoPodApp` 中接入 `miniPlayer` 槽位、给 `EchoPodNavHost` 传 `hasMiniPlayer`。详细步骤见 [coding-steps-miniplayer.md](coding-steps-miniplayer.md)。
 
 外壳里唯一的业务数据是"正在播放"。用它打通 domain → data → presentation 的完整链路，以后接 Media3 时只替换 data 层。如果只想先交付导航栏，跳过本步，外壳的 `miniPlayer` 槽位传空即可。
 

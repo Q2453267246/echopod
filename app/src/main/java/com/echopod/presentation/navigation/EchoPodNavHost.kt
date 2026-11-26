@@ -13,6 +13,7 @@ import com.echopod.presentation.feature.discover.DiscoverScreen
 import com.echopod.presentation.feature.home.HomeScreen
 import com.echopod.presentation.feature.profile.ProfileScreen
 import com.echopod.presentation.feature.subscriptions.SubscriptionsScreen
+import com.echopod.presentation.shell.miniPlayerStyleFor
 
 /** Quiet Paper 动效规范：按钮 / 选中态 200ms。一级 Tab 之间只做淡入淡出。 */
 private const val TopLevelFadeMillis = 200
@@ -42,15 +43,9 @@ fun EchoPodNavHost(
         else -> 24.dp
     }
 
-    val bottomExtraPadding = if (!hasMiniPlayer) {
-        0.dp
-    } else {
-        when (layout) {
-            NavigationLayout.BottomBar -> 72.dp   // 64dp 迷你播放器 + 8dp 间距
-            NavigationLayout.MediumRail -> 84.dp  // 68dp 迷你播放器 + 16dp 间距
-            NavigationLayout.ExpandedRail -> 0.dp // Expanded 外壳不渲染悬浮迷你播放器
-        }
-    }
+    // 迷你播放器占位高度与 MiniPlayerStyle 同源；Expanded 返回 null → 0dp
+    val bottomExtraPadding =
+        if (hasMiniPlayer) miniPlayerStyleFor(layout)?.reservedHeight ?: 0.dp else 0.dp
     NavHost(
         navController = appState.navController,
         startDestination = HomeRoute,

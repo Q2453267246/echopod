@@ -17,4 +17,12 @@
 
     <!-- 一级页面占位列表条目，如"订阅 · 第 12 项"（Step 10 之前使用） -->
     <string name="placeholder_item">%1$s · 第 %2$d 项</string>
+
+    <!-- 迷你播放器 -->
+    <string name="action_play">播放</string>
+    <string name="action_pause">暂停</string>
+    <string name="action_seek_back">快退 15 秒</string>
+    <string name="action_seek_forward">快进 30 秒</string>
+    <string name="action_open_player">打开播放器</string>
+    <string name="mini_player_remaining">剩余 %1$d 分</string>
 </resources>
