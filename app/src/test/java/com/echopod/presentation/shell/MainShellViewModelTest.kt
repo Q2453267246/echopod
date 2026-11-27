@@ -89,4 +89,18 @@ class MainShellViewModelTest {
 
         assertEquals(!before, viewModel.uiState.value.nowPlaying!!.isPlaying)
     }
+
+    @Test
+    fun seekBack_and_seekForward_updateProgress() = runTest {
+        val viewModel = createViewModel()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
+        val start = viewModel.uiState.value.nowPlaying!!.progress
+        viewModel.onEvent(MainShellEvent.SeekBack)
+        val afterBack = viewModel.uiState.value.nowPlaying!!.progress
+        assertTrue(afterBack < start)
+
+        viewModel.onEvent(MainShellEvent.SeekForward)
+        assertTrue(viewModel.uiState.value.nowPlaying!!.progress > afterBack)
+
+    }
 }

@@ -1,14 +1,36 @@
 package com.echopod.presentation.shell
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.echopod.core.designsystem.component.NavItem
 import com.echopod.presentation.navigation.EchoPodAppState
 import com.echopod.presentation.navigation.EchoPodNavHost
 import com.echopod.presentation.navigation.rememberEchoPodAppState
+
+
+private const val MiniPlayerAnimMillis = 300
 
 /**
  * 应用根 Composable（有状态入口），由 MainActivity 调用。
@@ -42,12 +64,39 @@ fun EchoPodApp(
         selectedIndex = selectedIndex,
         onItemClick = { index -> appState.navigateToTopLevel(destinations[index]) },
         onImportClick = onImportClick,
-        // TODO(Step 8)：miniPlayer = { layout -> uiState.nowPlaying?.let { MiniPlayer(...) } }，
-        //  同时给 EchoPodNavHost 传 hasMiniPlayer = uiState.nowPlaying != null
+        miniPlayer = { layout ->
+            val style = miniPlayerStyleFor(layout)
+            val nowPlaying = uiState.nowPlaying
+            // 先写后读：退出动画期间继续用最后一次非空值绘制
+            val lastNowPlaying = remember { mutableStateOf(nowPlaying) }
+            if (nowPlaying != null) lastNowPlaying.value = nowPlaying
+            AnimatedVisibility(
+                visible = style != null && nowPlaying != null,
+                modifier = Modifier.align(Alignment.BottomCenter),
+                enter = slideInVertically(tween(MiniPlayerAnimMillis) { it }) + fadeIn(tween(MiniPlayerAnimMillis)),
+                exit = slideOutVertically(tween(MiniPlayerAnimMillis)) { it } + fadeOut(tween(MiniPlayerAnimMillis)),
+            ) {
+                val shown = lastNowPlaying.value ?: return@AnimatedVisibility
+                val shownStyle = style ?: MiniPlayerStyle.Compact
+                MiniPlayer(
+                    nowPlaying = shown,
+                    style = shownStyle,
+                    onClick = { /* TODO(全屏播放器) */ },
+                    onTogglePlayback = { viewModel.onEvent(MainShellEvent.TogglePlayback) },
+                    onSeekBack = { viewModel.onEvent(MainShellEvent.SeekBack) },
+                    onSeekForward = { viewModel.onEvent(MainShellEvent.SeekForward) },
+                    modifier = Modifier
+                        .windowInsetsPadding(MiniPlayerInsets)
+                        .padding(horizontal = shownStyle.horizontalMargin)
+                        .padding(bottom = shownStyle.bottomMargin),
+                )
+            }
+        }
     ) {
         EchoPodNavHost(
             appState = appState,
             onImportClick = onImportClick,
+            hasMiniPlayer = uiState.nowPlaying != null
         )
     }
 
@@ -55,3 +104,16 @@ fun EchoPodApp(
         ImportPlaceholderDialog(onDismiss = { viewModel.onEvent(MainShellEvent.ImportDismissed) })
     }
 }
+
+
+/**
+ * 迷你播放器需要避开的系统区域：手势条 / 三键导航栏、横屏挖孔（只取左右与底部）。
+ *
+ * - Compact：外壳内容区已消费 navigationBars，这里自动为 0，卡片距导航栏正好 8dp；
+ * - Medium：外壳只消费了起始侧，这里会加上底部手势条与结束侧（横屏三键导航）的高度；
+ * - 刻意不用 safeDrawing：它包含 IME，键盘弹出时播放器会被顶上去。
+ */
+private val MiniPlayerInsets: WindowInsets
+    @Composable get() = WindowInsets.navigationBars
+        .union(WindowInsets.displayCutout)
+        .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)
